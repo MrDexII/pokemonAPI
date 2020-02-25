@@ -14,8 +14,7 @@ public class PokemonModelAssembler implements RepresentationModelAssembler<Pokem
     @Override
     public EntityModel<Pokemon> toModel(Pokemon pokemon) {
         return new EntityModel<>(pokemon,
-                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel(),
-                linkTo(methodOn(PokemonController.class).getAllPokemons()).withRel("allPokemons")
+                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel()
         );
     }
 }

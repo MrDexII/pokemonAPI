@@ -4,17 +4,14 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/pokemon")
@@ -22,12 +19,14 @@ public class PokemonController {
 
     private final PokemonService pokemonService;
     private final PokemonModelAssembler pokemonModelAssembler;
+    private final PagedResourcesAssembler pagedResourcesAssembler;
 
 
     @Autowired
-    public PokemonController(PokemonService pokemonService, PokemonModelAssembler pokemonModelAssembler) {
+    public PokemonController(PokemonService pokemonService, PokemonModelAssembler pokemonModelAssembler, PagedResourcesAssembler pagedResourcesAssembler) {
         this.pokemonService = pokemonService;
         this.pokemonModelAssembler = pokemonModelAssembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @PostMapping("/")
@@ -39,14 +38,12 @@ public class PokemonController {
                 .body(entityModel);
     }
 
-    @GetMapping("/")
-    public CollectionModel<EntityModel<Pokemon>> getAllPokemons() {
-        List<EntityModel<Pokemon>> allPokemons = pokemonService.getAllPokemons().stream()
-                .map(pokemonModelAssembler::toModel)
-                .collect(Collectors.toList());
+    @GetMapping("/all")
+    public ResponseEntity<PagedModel<Pokemon>> getAllPokemons(Pageable pageable) {
+        Page<Pokemon> allPokemons = pokemonService.getAllPokemons(pageable);
+        PagedModel pagedModel = pagedResourcesAssembler.toModel(allPokemons, pokemonModelAssembler);
 
-        return new CollectionModel<>(allPokemons,
-                linkTo(methodOn(PokemonController.class).getAllPokemons()).withSelfRel());
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/{id}")

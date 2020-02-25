@@ -6,12 +6,13 @@ import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.util.List;
 
 @Document("pokemon")
 @TypeAlias("pokemon")
+@Relation(collectionRelation = "pokemons", itemRelation = "pokemon")
 public class Pokemon {
     @Id
     private ObjectId id;
