@@ -4,9 +4,9 @@ import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonNotFoundException;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class PokemonService {
@@ -22,8 +22,8 @@ public class PokemonService {
         return pokemonRepository.save(pokemon);
     }
 
-    public List<Pokemon> getAllPokemons() {
-        return pokemonRepository.findAll();
+    public Page<Pokemon> getAllPokemons(Pageable pageable) {
+        return pokemonRepository.findAll(pageable);
     }
 
     public Pokemon getPokemonById(String id) {
