@@ -1,10 +1,10 @@
-package com.andrzej.RESTfullPokemonAPI;
+package com.andrzej.restFullPokemonAPI;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ResTfullPokemonApiApplicationTests {
+class RestFullPokemonApiApplicationTests {
 
 	@Test
 	void contextLoads() {

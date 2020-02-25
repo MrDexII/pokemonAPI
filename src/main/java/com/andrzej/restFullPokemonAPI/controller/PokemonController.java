@@ -1,8 +1,8 @@
-package com.andrzej.RESTfullPokemonAPI.controller;
+package com.andrzej.restFullPokemonAPI.controller;
 
-import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
-import com.andrzej.RESTfullPokemonAPI.model.PokemonModelAssembler;
-import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
+import com.andrzej.restFullPokemonAPI.model.Pokemon;
+import com.andrzej.restFullPokemonAPI.model.PokemonModelAssembler;
+import com.andrzej.restFullPokemonAPI.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +39,7 @@ public class PokemonController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<PagedModel<Pokemon>> getAllPokemons(Pageable pageable) {
+    public ResponseEntity<?> getAllPokemons(Pageable pageable) {
         Page<Pokemon> allPokemons = pokemonService.getAllPokemons(pageable);
         PagedModel pagedModel = pagedResourcesAssembler.toModel(allPokemons, pokemonModelAssembler);
 

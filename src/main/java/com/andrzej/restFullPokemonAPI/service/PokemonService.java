@@ -1,8 +1,8 @@
-package com.andrzej.RESTfullPokemonAPI.service;
+package com.andrzej.restFullPokemonAPI.service;
 
-import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonNotFoundException;
-import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
-import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
+import com.andrzej.restFullPokemonAPI.exceptions.PokemonNotFoundException;
+import com.andrzej.restFullPokemonAPI.model.Pokemon;
+import com.andrzej.restFullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

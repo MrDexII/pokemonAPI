@@ -1,6 +1,6 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.restFullPokemonAPI.repositorie;
 
-import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
+import com.andrzej.restFullPokemonAPI.model.Pokemon;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
