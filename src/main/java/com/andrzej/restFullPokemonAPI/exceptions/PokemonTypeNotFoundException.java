@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.exceptions;
+package com.andrzej.restFullPokemonAPI.exceptions;
 
 public class PokemonTypeNotFoundException extends RuntimeException {
     public PokemonTypeNotFoundException(String message) {

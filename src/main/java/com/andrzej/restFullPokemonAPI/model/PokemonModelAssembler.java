@@ -1,6 +1,6 @@
-package com.andrzej.RESTfullPokemonAPI.model;
+package com.andrzej.restFullPokemonAPI.model;
 
-import com.andrzej.RESTfullPokemonAPI.controller.PokemonController;
+import com.andrzej.restFullPokemonAPI.controller.PokemonController;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;

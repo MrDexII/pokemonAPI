@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.model;
+package com.andrzej.restFullPokemonAPI.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

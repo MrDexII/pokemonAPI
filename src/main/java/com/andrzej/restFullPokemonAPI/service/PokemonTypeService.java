@@ -1,8 +1,8 @@
-package com.andrzej.RESTfullPokemonAPI.service;
+package com.andrzej.restFullPokemonAPI.service;
 
-import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonTypeNotFoundException;
-import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
-import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
+import com.andrzej.restFullPokemonAPI.exceptions.PokemonTypeNotFoundException;
+import com.andrzej.restFullPokemonAPI.model.PokemonType;
+import com.andrzej.restFullPokemonAPI.repositorie.PokemonTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class PokemonTypeService {
-    private PokemonTypeRepository pokemonTypeRepository;
+    private final PokemonTypeRepository pokemonTypeRepository;
 
     @Autowired
     public PokemonTypeService(PokemonTypeRepository pokemonTypeRepository) {

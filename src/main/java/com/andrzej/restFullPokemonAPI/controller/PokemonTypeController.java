@@ -1,7 +1,7 @@
-package com.andrzej.RESTfullPokemonAPI.controller;
+package com.andrzej.restFullPokemonAPI.controller;
 
-import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
-import com.andrzej.RESTfullPokemonAPI.service.PokemonTypeService;
+import com.andrzej.restFullPokemonAPI.model.PokemonType;
+import com.andrzej.restFullPokemonAPI.service.PokemonTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("pokemon/type")
 public class PokemonTypeController {
 
-    private PokemonTypeService pokemonTypeService;
+    private final PokemonTypeService pokemonTypeService;
 
     @Autowired
     public PokemonTypeController(PokemonTypeService pokemonTypeService) {
