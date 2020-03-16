@@ -1,10 +1,12 @@
-package com.andrzej.restFullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie;
 
-import com.andrzej.restFullPokemonAPI.model.Pokemon;
+import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PokemonRepository extends MongoRepository<Pokemon, String> {
-    Pokemon findByPokemonName(String name);
+    Optional<Pokemon> findByPokemonName(String name);
 }

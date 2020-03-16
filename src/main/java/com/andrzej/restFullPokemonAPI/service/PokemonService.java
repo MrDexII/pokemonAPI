@@ -1,46 +1,68 @@
-package com.andrzej.restFullPokemonAPI.service;
+package com.andrzej.RESTfullPokemonAPI.service;
 
-import com.andrzej.restFullPokemonAPI.exceptions.PokemonNotFoundException;
-import com.andrzej.restFullPokemonAPI.model.Pokemon;
-import com.andrzej.restFullPokemonAPI.repositorie.PokemonRepository;
+import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
+import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonNotFoundException;
+import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
+import com.andrzej.RESTfullPokemonAPI.model.PokemonPageable;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PokemonService {
 
+    private final PokemonModelAssembler pokemonModelAssembler;
+    private final PagedResourcesAssembler<Pokemon> pagedResourcesAssembler;
+    private final int maxPageSize;
     private final PokemonRepository pokemonRepository;
 
+
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository) {
+    public PokemonService(PokemonModelAssembler pokemonModelAssembler, PagedResourcesAssembler<Pokemon> pagedResourcesAssembler, PokemonRepository pokemonRepository) {
+        this.pokemonModelAssembler = pokemonModelAssembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
         this.pokemonRepository = pokemonRepository;
+
+        this.maxPageSize = 10;
     }
 
-    public Pokemon createPokemon(Pokemon pokemon) {
-        return pokemonRepository.save(pokemon);
+    public EntityModel<Pokemon> createPokemon(Pokemon pokemon) {
+        return pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
     }
 
-    public Page<Pokemon> getAllPokemons(Pageable pageable) {
-        return pokemonRepository.findAll(pageable);
+    public PagedModel<EntityModel<Pokemon>> getAllPokemons(Pageable pageable) {
+        if (pageable.getPageSize() >= 10){
+            pageable = new PokemonPageable(pageable.getPageNumber(), maxPageSize, pageable.getOffset(), pageable.getSort());
+        }
+        pokemonModelAssembler.setPageable(pageable);
+
+        return pagedResourcesAssembler.toModel(pokemonRepository.findAll(pageable), pokemonModelAssembler);
     }
 
-    public Pokemon getPokemonById(String id) {
-        return pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found"));
+    public EntityModel<Pokemon> getPokemonById(String id) {
+        return pokemonModelAssembler.toModel(pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
     }
 
-    public Pokemon updatePokemon(String id, Pokemon pokemon) {
+    public EntityModel<Pokemon> getPokemonByName(String name) {
+        return pokemonModelAssembler.toModel(pokemonRepository.findByPokemonName(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon with name: " + name + " not found")));
+    }
+
+    public EntityModel<Pokemon> updatePokemon(String id, Pokemon pokemon) {
         Pokemon pokemon1 = pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found"));
         pokemon.setId(pokemon1.getId());
-        return pokemonRepository.save(pokemon);
+        return pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
     }
 
     public void deletePokemon(String id) {
         pokemonRepository.delete(pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
     }
 
-    public Pokemon getPokemonByName(String name) {
-        return pokemonRepository.findByPokemonName(name);
+    public boolean isPokemonPresent(String pokemonName) {
+        return pokemonRepository.findByPokemonName(pokemonName).isPresent();
     }
 }
