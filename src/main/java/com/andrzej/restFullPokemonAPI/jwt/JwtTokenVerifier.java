@@ -1,4 +1,4 @@
-package com.andrzej.restFullPokemonAPI.jwt;
+package com.andrzej.RESTfullPokemonAPI.jwt;
 
 import com.google.common.base.Strings;
 import io.jsonwebtoken.Claims;

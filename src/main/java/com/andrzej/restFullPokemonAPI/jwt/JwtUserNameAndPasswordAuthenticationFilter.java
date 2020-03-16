@@ -1,4 +1,4 @@
-package com.andrzej.restFullPokemonAPI.jwt;
+package com.andrzej.RESTfullPokemonAPI.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;

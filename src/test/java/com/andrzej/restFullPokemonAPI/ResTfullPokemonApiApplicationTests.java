@@ -1,4 +1,4 @@
-package com.andrzej.restFullPokemonAPI;
+package com.andrzej.RESTfullPokemonAPI;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
