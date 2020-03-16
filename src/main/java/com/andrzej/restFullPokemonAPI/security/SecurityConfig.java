@@ -1,4 +1,4 @@
-package com.andrzej.restFullPokemonAPI;
+package com.andrzej.restFullPokemonAPI.security;
 
 import com.andrzej.restFullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.restFullPokemonAPI.jwt.JwtTokenVerifier;
