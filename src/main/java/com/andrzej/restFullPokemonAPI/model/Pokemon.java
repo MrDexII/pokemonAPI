@@ -17,6 +17,7 @@ public class Pokemon {
     @Id
     private ObjectId id;
     private String pokemonName;
+    private String imageUrl;
     @DBRef
     private List<PokemonType> pokemonType;
 
@@ -25,9 +26,10 @@ public class Pokemon {
 
 
     @PersistenceConstructor
-    public Pokemon(ObjectId id, String pokemonName, List<PokemonType> pokemonType) {
+    public Pokemon(ObjectId id, String pokemonName, String imageUrl, List<PokemonType> pokemonType) {
         this.id = id;
         this.pokemonName = pokemonName;
+        this.imageUrl = imageUrl;
         this.pokemonType = pokemonType;
     }
 
@@ -62,5 +64,13 @@ public class Pokemon {
                 ", name='" + pokemonName + '\'' +
                 ", type=" + pokemonType +
                 '}';
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

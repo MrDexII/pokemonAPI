@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 public class ApplicationUser implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,7 +21,6 @@ public class ApplicationUser implements UserDetails {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
-
 
     public ApplicationUser(String username,
                            String password,
@@ -38,6 +36,18 @@ public class ApplicationUser implements UserDetails {
         this.isAccountNonLocked = isAccountNonLocked;
         this.isCredentialsNonExpired = isCredentialsNonExpired;
         this.isEnabled = isEnabled;
+    }
+
+    public ApplicationUser(String username,
+                           String password,
+                           List<Role> authorities) {
+        this.username = username;
+        this.password = password;
+        this.roles = authorities;
+        this.isAccountNonExpired = true;
+        this.isAccountNonLocked = true;
+        this.isCredentialsNonExpired = true;
+        this.isEnabled = true;
     }
 
     public ApplicationUser() {
