@@ -17,11 +17,14 @@ public class PokemonModelAssembler implements RepresentationModelAssembler<Pokem
 
     @Override
     public EntityModel<Pokemon> toModel(Pokemon pokemon) {
-        return new EntityModel<>(pokemon,
+        return pageable != null ? new EntityModel<>(pokemon,
                 linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel(),
                 linkTo(methodOn(PokemonController.class).getAllPokemons(pageable))
                         .slash(String.format("?page=%d&size=%d", 0, pageable.getPageSize()))
                         .withRel("allPokemons"),
+                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete"))
+                : new EntityModel<>(pokemon,
+                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel(),
                 linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete")
         );
     }
