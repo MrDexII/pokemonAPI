@@ -6,7 +6,6 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonPageable;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -45,21 +44,25 @@ public class PokemonService {
     }
 
     public EntityModel<Pokemon> getPokemonById(String id) {
-        return pokemonModelAssembler.toModel(pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
+        return pokemonModelAssembler.toModel(pokemonRepository.findById(id).orElseThrow(() ->
+                new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
     }
 
     public EntityModel<Pokemon> getPokemonByName(String name) {
-        return pokemonModelAssembler.toModel(pokemonRepository.findByPokemonName(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon with name: " + name + " not found")));
+        return pokemonModelAssembler.toModel(pokemonRepository.findByPokemonName(name).orElseThrow(() ->
+                new PokemonNotFoundException("Pokemon with name: " + name + " not found")));
     }
 
     public EntityModel<Pokemon> updatePokemon(String id, Pokemon pokemon) {
-        Pokemon pokemon1 = pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found"));
+        Pokemon pokemon1 = pokemonRepository.findById(id).orElseThrow(() ->
+                new PokemonNotFoundException("Pokemon with id: " + id + " not found"));
         pokemon.setId(pokemon1.getId());
         return pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
     }
 
     public void deletePokemon(String id) {
-        pokemonRepository.delete(pokemonRepository.findById(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
+        pokemonRepository.delete(pokemonRepository.findById(id).orElseThrow(() ->
+                new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
     }
 
     public boolean isPokemonPresent(String pokemonName) {

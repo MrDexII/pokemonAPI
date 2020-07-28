@@ -17,6 +17,6 @@ public class MySQLApplicationUserDaoService implements ApplicationUserDao {
 
     @Override
     public Optional<ApplicationUser> selectApplicationUserByUsername(String username) {
-        return Optional.ofNullable(userRepository.findByUsername(username));
+        return (userRepository.findByUsername(username));
     }
 }
