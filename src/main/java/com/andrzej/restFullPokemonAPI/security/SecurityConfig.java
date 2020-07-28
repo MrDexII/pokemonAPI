@@ -28,8 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final ApplicationUserService applicationUserService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private SecretKey secretKey;
-    private JwtConfig jwtConfig;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Autowired
     public SecurityConfig(PasswordEncoder passwordEncoder,
