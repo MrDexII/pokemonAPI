@@ -16,7 +16,7 @@ public class ApplicationUser implements UserDetails {
     private String username;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    private List<Role> authorities;
     private boolean isAccountNonExpired;
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
@@ -31,7 +31,7 @@ public class ApplicationUser implements UserDetails {
                            boolean isEnabled) {
         this.username = username;
         this.password = password;
-        this.roles = authorities;
+        this.authorities = authorities;
         this.isAccountNonExpired = isAccountNonExpired;
         this.isAccountNonLocked = isAccountNonLocked;
         this.isCredentialsNonExpired = isCredentialsNonExpired;
@@ -43,7 +43,7 @@ public class ApplicationUser implements UserDetails {
                            List<Role> authorities) {
         this.username = username;
         this.password = password;
-        this.roles = authorities;
+        this.authorities = authorities;
         this.isAccountNonExpired = true;
         this.isAccountNonLocked = true;
         this.isCredentialsNonExpired = true;
@@ -59,7 +59,7 @@ public class ApplicationUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return authorities;
     }
 
     @Override
@@ -104,8 +104,8 @@ public class ApplicationUser implements UserDetails {
         this.password = password;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRoles(List<Role> authorities) {
+        this.authorities = authorities;
     }
 
     public void setAccountNonExpired(boolean accountNonExpired) {
