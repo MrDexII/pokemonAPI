@@ -34,6 +34,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> readOneUserById(@PathVariable("id") String id) {
+        Optional<ApplicationUser> user = userService.findUserById(id);
+        if (!user.isPresent())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + id + " not exists");
+        return ResponseEntity.ok(user.get());
+    }
+
     @GetMapping("/{name}")
     public ResponseEntity<?> readOneUserByName(@PathVariable("name") String name) {
         Optional<ApplicationUser> user = userService.findUserByName(name);
@@ -43,11 +51,16 @@ public class UserController {
         return ResponseEntity.ok(user.get());
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteUser(@PathVariable("name") String name) {
-        Optional<ApplicationUser> user = userService.findUserByName(name);
+    @PutMapping("/{id}")
+    public ResponseEntity<ApplicationUser> updateUser(@PathVariable("id") String id, @RequestBody ApplicationUser user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        Optional<ApplicationUser> user = userService.findUserById(id);
         if (!user.isPresent())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + name + " not exists");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id: " + id + " not exists");
 
         userService.deleteUser(user.get());
         return ResponseEntity.noContent().build();
