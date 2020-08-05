@@ -2,6 +2,7 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import com.andrzej.RESTfullPokemonAPI.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -33,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<?> readOneUser(@PathVariable("name") String name) {
+    public ResponseEntity<?> readOneUserByName(@PathVariable("name") String name) {
         Optional<ApplicationUser> user = userService.findUserByName(name);
         if (!user.isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + name + " not exists");
