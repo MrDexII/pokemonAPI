@@ -5,12 +5,19 @@ import org.springframework.data.domain.Sort;
 
 public class PokemonPageable implements Pageable {
 
-    private int pageNumber;
-    private int pageSize;
-    private long offset;
-    private Sort sort;
+    private final int pageNumber;
+    private final int pageSize;
+    private final long offset;
+    private final Sort sort;
 
-    public PokemonPageable(int pageNumber, int pageSize, long offset, Sort sort) {
+    public PokemonPageable(Pageable pageable) {
+        this.pageNumber = pageable.getPageNumber();
+        this.pageSize = 10;
+        this.offset = pageable.getOffset();
+        this.sort = pageable.getSort();
+    }
+
+    private PokemonPageable(int pageNumber, int pageSize, long offset, Sort sort) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.offset = offset;
