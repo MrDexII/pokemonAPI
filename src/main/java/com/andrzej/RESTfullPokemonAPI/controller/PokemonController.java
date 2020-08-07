@@ -9,6 +9,7 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class PokemonController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> createPokemon(@RequestBody Pokemon pokemon) {
         String pokemonName = pokemon.getPokemonName();
 
@@ -50,6 +52,7 @@ public class PokemonController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<EntityModel<Pokemon>> updatePokemon(@PathVariable("id") String id, @RequestBody Pokemon pokemon) {
         EntityModel<Pokemon> entityModel = pokemonService.updatePokemon(id, pokemon);
         return ResponseEntity
@@ -58,6 +61,7 @@ public class PokemonController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<HttpStatus> deletePokemon(@PathVariable("id") String id) {
         pokemonService.deletePokemon(id);
         return ResponseEntity.noContent().build();

@@ -17,7 +17,6 @@ public class PokemonService {
 
     private final PokemonModelAssembler pokemonModelAssembler;
     private final PagedResourcesAssembler<Pokemon> pagedResourcesAssembler;
-    private final int maxPageSize;
     private final PokemonRepository pokemonRepository;
 
 
@@ -26,8 +25,6 @@ public class PokemonService {
         this.pokemonModelAssembler = pokemonModelAssembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
         this.pokemonRepository = pokemonRepository;
-
-        this.maxPageSize = 10;
     }
 
     public EntityModel<Pokemon> createPokemon(Pokemon pokemon) {
@@ -36,7 +33,7 @@ public class PokemonService {
 
     public PagedModel<EntityModel<Pokemon>> getAllPokemons(Pageable pageable) {
         if (pageable.getPageSize() >= 10){
-            pageable = new PokemonPageable(pageable.getPageNumber(), maxPageSize, pageable.getOffset(), pageable.getSort());
+            pageable = new PokemonPageable(pageable);
         }
         pokemonModelAssembler.setPageable(pageable);
 
