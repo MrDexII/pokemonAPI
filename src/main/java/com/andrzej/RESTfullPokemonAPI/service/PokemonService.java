@@ -3,9 +3,9 @@ package com.andrzej.RESTfullPokemonAPI.service;
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonNotFoundException;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
-import com.andrzej.RESTfullPokemonAPI.model.PokemonPageable;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -21,7 +21,9 @@ public class PokemonService {
 
 
     @Autowired
-    public PokemonService(PokemonModelAssembler pokemonModelAssembler, PagedResourcesAssembler<Pokemon> pagedResourcesAssembler, PokemonRepository pokemonRepository) {
+    public PokemonService(PokemonModelAssembler pokemonModelAssembler,
+                          PagedResourcesAssembler<Pokemon> pagedResourcesAssembler,
+                          PokemonRepository pokemonRepository) {
         this.pokemonModelAssembler = pokemonModelAssembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
         this.pokemonRepository = pokemonRepository;
@@ -32,10 +34,10 @@ public class PokemonService {
     }
 
     public PagedModel<EntityModel<Pokemon>> getAllPokemons(Pageable pageable) {
-        if (pageable.getPageSize() >= 10){
-            pageable = new PokemonPageable(pageable);
-        }
-        pokemonModelAssembler.setPageable(pageable);
+//        if (pageable.getPageSize() >= 10){
+//            pageable = new PokemonPageable(pageable);
+//        }
+//        pokemonModelAssembler.setPageable(pageable);
 
         return pagedResourcesAssembler.toModel(pokemonRepository.findAll(pageable), pokemonModelAssembler);
     }
