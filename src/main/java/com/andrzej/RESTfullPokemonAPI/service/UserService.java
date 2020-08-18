@@ -25,7 +25,10 @@ public class UserService {
 
     public ApplicationUser createUser(ApplicationUser user) {
         Optional<Role> userRole = roleRepository.findByRole("USER");
-        ApplicationUser newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), List.of(userRole.get()));
+        ApplicationUser newUser = null;
+        if (userRole.isPresent()) {
+            newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), List.of(userRole.get()));
+        } else throw new RuntimeException("User role not found");
         return userRepository.save(newUser);
     }
 
