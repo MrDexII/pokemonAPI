@@ -42,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok(user.get());
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/byName/{name}")
     public ResponseEntity<?> readOneUserByName(@PathVariable("name") String name) {
         Optional<ApplicationUser> user = userService.findUserByName(name);
         if (!user.isPresent())
@@ -62,7 +62,7 @@ public class UserController {
         if (!user.isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id: " + id + " not exists");
 
-        userService.deleteUser(user.get());
+        userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,15 +1,16 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-@Service
+@Repository
 public class UserDAO implements UserRepository {
 
     @PersistenceContext
@@ -18,52 +19,52 @@ public class UserDAO implements UserRepository {
     @Override
     @Transactional
     public ApplicationUser save(ApplicationUser user) {
-
         entityManager.persist(user);
-
         return user;
     }
 
     @Override
-    public Optional<ApplicationUser> findById(Long id) {
-        String queryString = "SELECT * " +
-                "FROM user" +
-                "WHERE id=?id";
-
-        return entityManager.createQuery(queryString, ApplicationUser.class)
-                .setParameter("id", id)
-                .getResultStream()
-                .findFirst();
-    }
-
-    @Override
-    public boolean existsById(Long var1) {
-        return false;
-    }
-
-    @Override
     public List<ApplicationUser> findAll() {
-        return null;
+        String queryString = "SELECT * FROM user";
+        List<ApplicationUser> users = entityManager
+                .createNativeQuery(queryString, ApplicationUser.class)
+                .getResultList();
+        return users;
     }
 
     @Override
-    public void deleteById(Long var1) {
+    public Optional<ApplicationUser> findById(Long id) {
+        String queryString = "SELECT * FROM user WHERE id = :id";
+        List<ApplicationUser> user = entityManager
+                .createNativeQuery(queryString, ApplicationUser.class)
+                .setParameter("id", id)
+                .getResultList();
 
+        return user.stream().findFirst();
+    }
+
+    @Override
+    public boolean existsById(Long id)
+    {
+        return findById(id).isPresent();
     }
 
     @Override
     public Optional<ApplicationUser> findByUsername(String username) {
         String queryString = "SELECT * FROM user WHERE username=:name";
-
-        List<ApplicationUser> name = entityManager.createNativeQuery(queryString, ApplicationUser.class)
+        List<ApplicationUser> user = entityManager
+                .createNativeQuery(queryString, ApplicationUser.class)
                 .setParameter("name", username)
                 .getResultList();
-
-        return Optional.of(name.get(0));
+        return user.stream().findFirst();
     }
 
     @Override
-    public void delete(ApplicationUser user) {
-
+    @Transactional
+    public void deleteById(Long id) {
+        String queryString = "DELETE FROM user_authorities WHERE application_user_id = :id";
+        entityManager.createNativeQuery(queryString).setParameter("id", id).executeUpdate();
+        queryString = "DELETE FROM user WHERE id=:id";
+        entityManager.createNativeQuery(queryString).setParameter("id", id).executeUpdate();
     }
 }
