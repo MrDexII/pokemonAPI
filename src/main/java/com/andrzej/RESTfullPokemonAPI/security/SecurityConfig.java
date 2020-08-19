@@ -19,7 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
-import java.util.List;
+import java.util.Set;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void createAdminUser() {
         if (!userRepository.existsById(1L)) {
             if (!roleRepository.existsById(1L) || !roleRepository.existsById(2L)) {
-                List<Role> roles = List.of(new Role(1L, "ADMIN"),
+                Set<Role> roles = Set.of(new Role(1L, "ADMIN"),
                         new Role(2L, "USER"));
                 roleRepository.saveAll(roles);
 
