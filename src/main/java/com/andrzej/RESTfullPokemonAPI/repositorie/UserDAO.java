@@ -8,7 +8,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Repository
 public class UserDAO implements UserRepository {
@@ -19,7 +18,11 @@ public class UserDAO implements UserRepository {
     @Override
     @Transactional
     public ApplicationUser save(ApplicationUser user) {
-        entityManager.persist(user);
+        if (user.getUser_id() != null) {
+            entityManager.merge(user);
+        } else {
+            entityManager.persist(user);
+        }
         return user;
     }
 
@@ -34,7 +37,7 @@ public class UserDAO implements UserRepository {
 
     @Override
     public Optional<ApplicationUser> findById(Long id) {
-        String queryString = "SELECT * FROM user WHERE id = :id";
+        String queryString = "SELECT * FROM user WHERE user_id = :id";
         List<ApplicationUser> user = entityManager
                 .createNativeQuery(queryString, ApplicationUser.class)
                 .setParameter("id", id)
@@ -44,8 +47,7 @@ public class UserDAO implements UserRepository {
     }
 
     @Override
-    public boolean existsById(Long id)
-    {
+    public boolean existsById(Long id) {
         return findById(id).isPresent();
     }
 

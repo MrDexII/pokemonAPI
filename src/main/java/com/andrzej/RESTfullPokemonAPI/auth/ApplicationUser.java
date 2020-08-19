@@ -5,18 +5,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "User")
 public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long user_id;
     private String username;
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> authorities;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "User_Role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> authorities;
     private boolean isAccountNonExpired;
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
@@ -24,7 +29,7 @@ public class ApplicationUser implements UserDetails {
 
     public ApplicationUser(String username,
                            String password,
-                           List<Role> authorities,
+                           Set<Role> authorities,
                            boolean isAccountNonExpired,
                            boolean isAccountNonLocked,
                            boolean isCredentialsNonExpired,
@@ -40,7 +45,7 @@ public class ApplicationUser implements UserDetails {
 
     public ApplicationUser(String username,
                            String password,
-                           List<Role> authorities) {
+                           Set<Role> authorities) {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
@@ -53,8 +58,8 @@ public class ApplicationUser implements UserDetails {
     public ApplicationUser() {
     }
 
-    public Long getId() {
-        return id;
+    public Long getUser_id() {
+        return user_id;
     }
 
     @Override
@@ -92,8 +97,8 @@ public class ApplicationUser implements UserDetails {
         return isEnabled;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
     }
 
     public void setUsername(String username) {
@@ -104,7 +109,7 @@ public class ApplicationUser implements UserDetails {
         this.password = password;
     }
 
-    public void setRoles(List<Role> authorities) {
+    public void setRoles(Set<Role> authorities) {
         this.authorities = authorities;
     }
 

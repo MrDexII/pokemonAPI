@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -27,7 +28,7 @@ public class UserService {
         Optional<Role> userRole = roleRepository.findByRole("USER");
         ApplicationUser newUser;
         if (userRole.isPresent()) {
-            newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), List.of(userRole.get()));
+            newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), Set.of(userRole.get()));
         } else throw new RuntimeException("User role not found");
         return userRepository.save(newUser);
     }
@@ -53,7 +54,7 @@ public class UserService {
         if (!userFroDb.isPresent()) {
             throw new UserNotFoundException("User with id: " + id + " not found");
         }
-        user.setId(Long.valueOf(id));
+        user.setUser_id(Long.valueOf(id));
         return userRepository.save(user);
     }
 }
