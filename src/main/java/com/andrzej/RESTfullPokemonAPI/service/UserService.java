@@ -25,7 +25,7 @@ public class UserService {
 
     public ApplicationUser createUser(ApplicationUser user) {
         Optional<Role> userRole = roleRepository.findByRole("USER");
-        ApplicationUser newUser = null;
+        ApplicationUser newUser;
         if (userRole.isPresent()) {
             newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), List.of(userRole.get()));
         } else throw new RuntimeException("User role not found");
@@ -40,12 +40,12 @@ public class UserService {
         return userRepository.findByUsername(name);
     }
 
-    public void deleteUser(ApplicationUser user) {
-        userRepository.delete(user);
-    }
-
     public Optional<ApplicationUser> findUserById(String id) {
         return userRepository.findById(Long.valueOf(id));
+    }
+
+    public void deleteById(String id) {
+        userRepository.deleteById(Long.valueOf(id));
     }
 
     public ApplicationUser updateUser(String id, ApplicationUser user) {

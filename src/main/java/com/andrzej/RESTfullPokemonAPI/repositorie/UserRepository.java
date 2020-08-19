@@ -8,17 +8,16 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    ApplicationUser save(ApplicationUser var1);
+    ApplicationUser save(ApplicationUser user);
 
-    Optional<ApplicationUser> findById(Long var1);
+    Optional<ApplicationUser> findById(Long id);
 
-    boolean existsById(Long var1);
+    boolean existsById(Long id);
 
     List<ApplicationUser> findAll();
 
-    void deleteById(Long var1);
+    void deleteById(Long id);
 
     Optional<ApplicationUser> findByUsername(String username);
 
-    void delete(com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser user);
 }
