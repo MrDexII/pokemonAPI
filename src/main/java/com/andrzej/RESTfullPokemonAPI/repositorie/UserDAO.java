@@ -18,7 +18,7 @@ public class UserDAO implements UserRepository {
     @Override
     @Transactional
     public ApplicationUser save(ApplicationUser user) {
-        if (user.getUser_id() != null)
+        if (user.getUser_id() != null && findById(user.getUser_id()).isPresent())
             entityManager.merge(user);
         else
             entityManager.persist(user);

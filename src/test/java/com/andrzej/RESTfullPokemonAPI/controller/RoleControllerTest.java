@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.crypto.SecretKey;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -61,9 +62,8 @@ class RoleControllerTest {
 
     @Test
     public void shouldReturnStatusOkAndListOfRolesGetToken() throws Exception {
-        List<Role> roles = List.of(new Role(1L, "ADMIN"), new Role(2L, "USER"));
-        given(this.roleService.getAllRoles())
-                .willReturn(roles);
+        Set<Role> roles = Set.of(new Role(1L, "ADMIN"), new Role(2L, "USER"));
+        //given(this.roleService.getAllRoles()).willReturn(roles);
 
         String rolesJson = objectMapper.writeValueAsString(roles);
 
