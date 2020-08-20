@@ -18,11 +18,10 @@ public class UserDAO implements UserRepository {
     @Override
     @Transactional
     public ApplicationUser save(ApplicationUser user) {
-        if (user.getUser_id() != null) {
+        if (user.getUser_id() != null)
             entityManager.merge(user);
-        } else {
+        else
             entityManager.persist(user);
-        }
         return user;
     }
 
@@ -42,7 +41,6 @@ public class UserDAO implements UserRepository {
                 .createNativeQuery(queryString, ApplicationUser.class)
                 .setParameter("id", id)
                 .getResultList();
-
         return user.stream().findFirst();
     }
 
@@ -63,10 +61,7 @@ public class UserDAO implements UserRepository {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
-        String queryString = "DELETE FROM user_authorities WHERE application_user_id = :id";
-        entityManager.createNativeQuery(queryString).setParameter("id", id).executeUpdate();
-        queryString = "DELETE FROM user WHERE id=:id";
-        entityManager.createNativeQuery(queryString).setParameter("id", id).executeUpdate();
+    public void delete(ApplicationUser user) {
+        entityManager.remove(user);
     }
 }
