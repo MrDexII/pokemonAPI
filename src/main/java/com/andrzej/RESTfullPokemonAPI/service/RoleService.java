@@ -3,6 +3,7 @@ package com.andrzej.RESTfullPokemonAPI.service;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    public ResponseEntity<List<Role>> getAllRoles() {
+        List<Role> roles = roleRepository.findAll();
+        return ResponseEntity.ok(roles);
     }
 }
