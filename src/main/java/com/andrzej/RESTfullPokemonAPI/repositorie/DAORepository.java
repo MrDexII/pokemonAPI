@@ -15,6 +15,4 @@ public interface DAORepository<T, E> {
 
     void delete(T user);
 
-    Optional<T> findByUsername(String username);
-
 }
