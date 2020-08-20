@@ -2,9 +2,10 @@ package com.andrzej.RESTfullPokemonAPI.service;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
-import com.andrzej.RESTfullPokemonAPI.exceptions.UserNotFoundException;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,37 +25,55 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ApplicationUser createUser(ApplicationUser user) {
-        Optional<Role> userRole = roleRepository.findByRole("USER");
+    public ResponseEntity<?> createUser(ApplicationUser user) {
         ApplicationUser newUser;
+        Optional<Role> userRole = roleRepository.findByRole("USER");
         if (userRole.isPresent()) {
             newUser = new ApplicationUser(user.getUsername(), passwordEncoder.encode(user.getPassword()), Set.of(userRole.get()));
-        } else throw new RuntimeException("User role not found");
-        return userRepository.save(newUser);
-    }
-
-    public List<ApplicationUser> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public Optional<ApplicationUser> findUserByName(String name) {
-        return userRepository.findByUsername(name);
-    }
-
-    public Optional<ApplicationUser> findUserById(String id) {
-        return userRepository.findById(Long.valueOf(id));
-    }
-
-    public void deleteById(String id) {
-        userRepository.deleteById(Long.valueOf(id));
-    }
-
-    public ApplicationUser updateUser(String id, ApplicationUser user) {
-        Optional<ApplicationUser> userFroDb = findUserById(id);
-        if (!userFroDb.isPresent()) {
-            throw new UserNotFoundException("User with id: " + id + " not found");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role USER not found");
         }
-        user.setUser_id(Long.valueOf(id));
-        return userRepository.save(user);
+
+        Optional<ApplicationUser> userExists = userRepository.findByUsername(user.getUsername());
+        return userExists.isPresent() ?
+                ResponseEntity.status(HttpStatus.CONFLICT).body("User with name " + user.getUsername() + " already exists") :
+                ResponseEntity.ok(userRepository.save(newUser));
+    }
+
+    public ResponseEntity<List<ApplicationUser>> getAllUsers() {
+        List<ApplicationUser> users = userRepository.findAll();
+        return ResponseEntity.ok(users);
+    }
+
+    public ResponseEntity<?> findUserByName(String name) {
+        Optional<ApplicationUser> user = userRepository.findByUsername(name);
+        return user.isPresent() ?
+                ResponseEntity.ok(user.get()) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + name + " not exists");
+    }
+
+    public ResponseEntity<?> findUserById(String id) {
+        Optional<ApplicationUser> user = userRepository.findById(Long.valueOf(id));
+        return user.isPresent() ?
+                ResponseEntity.ok(user.get()) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + id + " not exists");
+
+    }
+
+    public ResponseEntity<?> deleteById(String id) {
+        Optional<ApplicationUser> user = userRepository.findById(Long.valueOf(id));
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not exists");
+    }
+
+    public ResponseEntity<?> updateUser(String id, ApplicationUser user) {
+        Optional<ApplicationUser> userExists = userRepository.findById(Long.valueOf(id));
+        return userExists.isPresent() ?
+                ResponseEntity.ok(userRepository.save(user)) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found");
+
     }
 }
