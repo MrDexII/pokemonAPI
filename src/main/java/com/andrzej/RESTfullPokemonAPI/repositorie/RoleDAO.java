@@ -1,6 +1,7 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -12,7 +13,12 @@ import java.util.Optional;
 public class RoleDAO implements RoleRepository {
 
     @PersistenceContext
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+
+    @Autowired
+    public RoleDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Optional<Role> findByRole(String roleName) {
@@ -26,7 +32,7 @@ public class RoleDAO implements RoleRepository {
 
     @Override
     public Role save(Role role) {
-        if (role.getRole_id() != null && findById(role.getRole_id()).isPresent())
+        if (role.getRole_id() != null)
             entityManager.merge(role);
         else
             entityManager.persist(role);

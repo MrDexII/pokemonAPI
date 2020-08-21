@@ -1,18 +1,23 @@
 package com.andrzej.RESTfullPokemonAPI.service;
 
-import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonTypeNotFoundException;
-import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonTypeModelAssembler;
+import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PokemonTypeService {
-    private PokemonTypeRepository pokemonTypeRepository;
-    private PokemonTypeModelAssembler pokemonTypeModelAssembler;
+
+    private final PokemonTypeRepository pokemonTypeRepository;
+    private final PokemonTypeModelAssembler pokemonTypeModelAssembler;
 
     @Autowired
     public PokemonTypeService(PokemonTypeRepository pokemonTypeRepository,
@@ -21,37 +26,52 @@ public class PokemonTypeService {
         this.pokemonTypeModelAssembler = pokemonTypeModelAssembler;
     }
 
-    public EntityModel<PokemonType> createPokemonType(PokemonType pokemonType) {
-        return pokemonTypeModelAssembler.toModel(pokemonTypeRepository.save(pokemonType));
+    public ResponseEntity<?> createPokemonType(PokemonType newPokemonType) {
+        String typeName = newPokemonType.getName();
+        Optional<PokemonType> pokemonTypeOptional = pokemonTypeRepository.findByName(typeName);
+
+        if (pokemonTypeOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Pokemon type with name: " + typeName + " already exists");
+        }
+
+        EntityModel<PokemonType> pokemonTypeEntityModel = pokemonTypeModelAssembler.toModel(pokemonTypeRepository.save(newPokemonType));
+        return ResponseEntity.created(pokemonTypeEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(pokemonTypeEntityModel);
     }
 
-    public EntityModel<PokemonType> getPokemonType(String id) {
-        return pokemonTypeModelAssembler.toModel(pokemonTypeRepository.findById(id).orElseThrow(
-                () -> new PokemonTypeNotFoundException("Pokemon type with id: " + id + " not found")));
+    public ResponseEntity<?> getPokemonType(String id) {
+        Optional<PokemonType> pokemonType = pokemonTypeRepository.findById(id);
+        return pokemonType.isPresent() ?
+                ResponseEntity.ok(pokemonTypeModelAssembler.toModel(pokemonType.get())) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon type with id: " + id + " not found");
     }
 
-    public CollectionModel<EntityModel<PokemonType>> getAllPokemonTypes() {
-        return pokemonTypeModelAssembler.toCollectionModel(pokemonTypeRepository.findAll());
+    public ResponseEntity<CollectionModel<EntityModel<PokemonType>>> getAllPokemonTypes() {
+        CollectionModel<EntityModel<PokemonType>> allPokemonTypes = pokemonTypeModelAssembler.toCollectionModel(pokemonTypeRepository.findAll());
+        return ResponseEntity.ok(allPokemonTypes);
     }
 
-    public EntityModel<PokemonType> getPokemonTypeByName(String pokemonTypeName) {
-        return pokemonTypeModelAssembler.toModel(pokemonTypeRepository.findByName(pokemonTypeName.toUpperCase()).orElseThrow(
-                ()-> new PokemonTypeNotFoundException("Pokemon type with name: " + pokemonTypeName + " not found")));
+    public ResponseEntity<?> getPokemonTypeByName(String pokemonTypeName) {
+        Optional<PokemonType> pokemonTypeNameOptional = pokemonTypeRepository.findByName(pokemonTypeName);
+        return pokemonTypeNameOptional.isPresent() ?
+                ResponseEntity.ok(pokemonTypeModelAssembler.toModel(pokemonTypeNameOptional.get())) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon type with name: " + pokemonTypeName + " not found");
     }
 
-    public EntityModel<PokemonType> updatePokemonType(String id, PokemonType pokemonType) {
-        PokemonType tempPokemonType = pokemonTypeRepository.findById(id).orElseThrow(
-                () -> new PokemonTypeNotFoundException("Pokemon type with id: " + id + " not found"));
-        pokemonType.setId(tempPokemonType.getId());
-        return pokemonTypeModelAssembler.toModel(pokemonTypeRepository.save(pokemonType));
+    public ResponseEntity<?> updatePokemonType(String id, PokemonType pokemonType) {
+        if (!pokemonTypeRepository.findById(id).isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon type with id: " + id + " not found");
+        }
+        pokemonType.setId(id);
+        return ResponseEntity.ok(pokemonTypeModelAssembler.toModel(pokemonTypeRepository.save(pokemonType)));
     }
 
-    public void deletePokemonType(String id) {
-        pokemonTypeRepository.delete(pokemonTypeRepository.findById(id).orElseThrow(
-                () -> new PokemonTypeNotFoundException("Pokemon type with id: " + id + " not found")));
-    }
-
-    public boolean isPokemonTypePresent(String pokemonName) {
-        return pokemonTypeRepository.findByName(pokemonName).isPresent();
+    public ResponseEntity<?> deletePokemonType(String id) {
+        Optional<PokemonType> pokemonType = pokemonTypeRepository.findById(id);
+        if (pokemonType.isPresent()) {
+            pokemonTypeRepository.delete(pokemonType.get());
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon type with id: " + id + " not found");
+        }
     }
 }
