@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface PokemonTypeRepository extends MongoRepository<PokemonType, String> {
+public interface PokemonTypeRepository extends DAORepository<PokemonType, String> {
     Optional<PokemonType> findByName(String name);
 }

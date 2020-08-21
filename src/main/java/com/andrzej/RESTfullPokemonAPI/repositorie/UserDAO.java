@@ -1,6 +1,7 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,12 @@ import java.util.Optional;
 public class UserDAO implements UserRepository {
 
     @PersistenceContext
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+
+    @Autowired
+    public UserDAO(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @Transactional

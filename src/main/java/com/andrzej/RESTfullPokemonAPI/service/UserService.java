@@ -4,6 +4,7 @@ import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,10 +16,12 @@ import java.util.Set;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;

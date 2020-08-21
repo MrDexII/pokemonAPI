@@ -5,11 +5,8 @@ import com.andrzej.RESTfullPokemonAPI.service.PokemonTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("pokemon/type")
@@ -23,45 +20,33 @@ public class PokemonTypeController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> createPokemonType(@RequestBody PokemonType pokemonType, UriComponentsBuilder uriComponentsBuilder) {
-        String typeName = pokemonType.getName();
-
-        if (pokemonTypeService.isPokemonTypePresent(typeName)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Pokemon type with name: " + typeName + " already exists");
-        }
-
-        EntityModel<PokemonType> pokemonTypeEntityModel = pokemonTypeService.createPokemonType(pokemonType);
-        return ResponseEntity.created(pokemonTypeEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(pokemonTypeEntityModel);
+    public ResponseEntity<?> createPokemonType(@RequestBody PokemonType pokemonType) {
+        return pokemonTypeService.createPokemonType(pokemonType);
     }
 
     @GetMapping("/")
     public ResponseEntity<CollectionModel<EntityModel<PokemonType>>> getAllPokemonTypes() {
-        CollectionModel<EntityModel<PokemonType>> allPokemonTypes = pokemonTypeService.getAllPokemonTypes();
-        return ResponseEntity.ok(allPokemonTypes);
+        return pokemonTypeService.getAllPokemonTypes();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<PokemonType>> getPokemonType(@PathVariable("id") String id) {
-        EntityModel<PokemonType> pokemonType = pokemonTypeService.getPokemonType(id);
-        return ResponseEntity.ok(pokemonType);
+    public ResponseEntity<?> getPokemonType(@PathVariable("id") String id) {
+        return pokemonTypeService.getPokemonType(id);
     }
 
     @GetMapping("/find")
-    public ResponseEntity<EntityModel<PokemonType>> getPokemonTypeByName(@RequestParam("name") String pokemonTypeName) {
-        EntityModel<PokemonType> pokemonType = pokemonTypeService.getPokemonTypeByName(pokemonTypeName);
-        return ResponseEntity.ok(pokemonType);
+    public ResponseEntity<?> getPokemonTypeByName(@RequestParam("name") String pokemonTypeName) {
+        return pokemonTypeService.getPokemonTypeByName(pokemonTypeName);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<PokemonType>> updatePokemonType(@PathVariable("id") String id, @RequestBody PokemonType pokemonType) {
-        EntityModel<PokemonType> pokemonTypeEntityModel = pokemonTypeService.updatePokemonType(id, pokemonType);
-        return ResponseEntity.created(pokemonTypeEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(pokemonTypeEntityModel);
+    public ResponseEntity<?> updatePokemonType(@PathVariable("id") String id, @RequestBody PokemonType pokemonType) {
+        return pokemonTypeService.updatePokemonType(id, pokemonType);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletePokemonType(@PathVariable("id") String id) {
-        pokemonTypeService.deletePokemonType(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletePokemonType(@PathVariable("id") String id) {
+        return pokemonTypeService.deletePokemonType(id);
     }
 
 }
