@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -44,11 +45,10 @@ public class ApplicationUser implements UserDetails {
     }
 
     public ApplicationUser(String username,
-                           String password,
-                           Set<Role> authorities) {
+                           String password) {
         this.username = username;
         this.password = password;
-        this.authorities = authorities;
+        this.authorities = Set.of(new Role(2L, "USER"));
         this.isAccountNonExpired = true;
         this.isAccountNonLocked = true;
         this.isCredentialsNonExpired = true;
@@ -127,5 +127,25 @@ public class ApplicationUser implements UserDetails {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApplicationUser that = (ApplicationUser) o;
+        return isAccountNonExpired == that.isAccountNonExpired &&
+                isAccountNonLocked == that.isAccountNonLocked &&
+                isCredentialsNonExpired == that.isCredentialsNonExpired &&
+                isEnabled == that.isEnabled &&
+                Objects.equals(user_id, that.user_id) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(authorities, that.authorities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user_id, username, password, authorities, isAccountNonExpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled);
     }
 }
