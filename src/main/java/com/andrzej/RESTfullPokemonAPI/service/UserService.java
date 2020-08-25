@@ -46,8 +46,7 @@ public class UserService {
         Optional<ApplicationUser> user = userRepository.findById(Long.valueOf(id));
         return user.isPresent() ?
                 ResponseEntity.ok(user.get()) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with name " + id + " not exists");
-
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not exists");
     }
 
     public ResponseEntity<?> deleteById(String id) {
@@ -63,7 +62,7 @@ public class UserService {
         Optional<ApplicationUser> userExists = userRepository.findById(Long.valueOf(id));
         return userExists.isPresent() ?
                 ResponseEntity.ok(userRepository.save(user)) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found");
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not exists");
 
     }
 }
