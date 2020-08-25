@@ -13,19 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.crypto.SecretKey;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -39,7 +38,7 @@ class RoleControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @SpyBean
     private RoleService roleService;
 
     @MockBean
@@ -61,15 +60,24 @@ class RoleControllerTest {
     private JwtConfig jwtConfig;
 
     @Test
-    public void shouldReturnStatusOkAndListOfRolesGetToken() throws Exception {
-        Set<Role> roles = Set.of(new Role(1L, "ADMIN"), new Role(2L, "USER"));
-        //given(this.roleService.getAllRoles()).willReturn(roles);
-
-        String rolesJson = objectMapper.writeValueAsString(roles);
+    public void shouldReturnStatusOkAndListOfRoles() throws Exception {
+        List<Role> roles = List.of(new Role(1L, "TestRole1"), new Role(2L, "TestRole2"));
+        given(this.roleRepository.findAll()).willReturn(roles);
 
         this.mockMvc.perform(get("/user/role/"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json(rolesJson));
+                .andExpect(content().json(objectMapper.writeValueAsString(roles)));
+    }
+
+    @Test
+    public void shouldReturnStatusOkAndEmptyList() throws Exception {
+        List<Role> roles = List.of();
+        given(this.roleRepository.findAll()).willReturn(roles);
+
+        this.mockMvc.perform(get("/user/role/"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(roles)));
     }
 }
