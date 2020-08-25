@@ -21,14 +21,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -65,7 +65,7 @@ class UserControllerTest {
 
 
     @Test
-    void ShouldReturnStatus201AndUserWithOneRole() throws Exception {
+    void ShouldReturnStatus201AndReturnUserWithOneRoleCreateUser() throws Exception {
         Role userRole = new Role(2L, "USER");
         String encodePassword = "123abcEncoded";
 
@@ -108,6 +108,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.username", is("testUser")))
                 .andExpect(jsonPath("$.password", is("123abcEncoded")))
                 .andExpect(jsonPath("$.authorities", hasSize(1)))
+                .andExpect(jsonPath("$.authorities[0]", hasEntry("role", "USER")))
                 .andExpect(jsonPath("$.enabled", is(true)))
                 .andExpect(jsonPath("$.accountNonExpired", is(true)))
                 .andExpect(jsonPath("$.accountNonLocked", is(true)))
@@ -115,7 +116,7 @@ class UserControllerTest {
     }
 
     @Test
-    void ShouldReturnStatus409() throws Exception {
+    void ShouldReturnStatus409CreateUser() throws Exception {
         ApplicationUser userGiven = new ApplicationUser();
         userGiven.setUsername("testUser");
         userGiven.setPassword("123abc");
@@ -134,22 +135,144 @@ class UserControllerTest {
     }
 
     @Test
-    void readAllUsers() {
+    void ShouldReturnStatus200AndReturnListOfAllUsersReadAllUsers() throws Exception {
+
+        given(this.userRepository.findAll()).willReturn(List.of(
+                new ApplicationUser("testUser1", "testUser1Password"),
+                new ApplicationUser("testUser2", "testUser2Password")));
+
+        this.mockMvc.perform(
+                get("/user/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]", hasEntry("username", "testUser1")))
+                .andExpect(jsonPath("$[0]", hasEntry("password", "testUser1Password")))
+                .andExpect(jsonPath("$[0].authorities[0]", hasEntry("role", "USER")))
+                .andExpect(jsonPath("$[1]", hasEntry("username", "testUser2")))
+                .andExpect(jsonPath("$[1]", hasEntry("password", "testUser2Password")))
+                .andExpect(jsonPath("$[1].authorities[0]", hasEntry("role", "USER")));
     }
 
     @Test
-    void readUserById() {
+    void ShouldReturnStatus200AndReturnEmptyListOfUsersReadAllUsers() throws Exception {
+
+        given(this.userRepository.findAll()).willReturn(List.of());
+
+        this.mockMvc.perform(
+                get("/user/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
-    void readOneUserByName() {
+    void ShouldReturnStatus200AndReturnOneUserReadUserById() throws Exception {
+        ApplicationUser user = new ApplicationUser("testUser", "testUserPassword");
+
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(user));
+
+        this.mockMvc.perform(
+                get("/user/123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username", is("testUser")))
+                .andExpect(jsonPath("$.password", is("testUserPassword")))
+                .andExpect(jsonPath("$.authorities", hasSize(1)))
+                .andExpect(jsonPath("$.authorities[0]", hasEntry("role", "USER")));
     }
 
     @Test
-    void updateUser() {
+    void ShouldReturnStatus404AndReturnNoUserReadUserById() throws Exception {
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                get("/user/123"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with id " + 123L + " not exists"));
     }
 
     @Test
-    void deleteUser() {
+    void ShouldReturnStatus200AndReturnOneUserReadUserByName() throws Exception {
+        ApplicationUser user = new ApplicationUser("testUser", "testUserPassword");
+
+        given(this.userRepository.findByUsername("testUser")).willReturn(Optional.of(user));
+
+        this.mockMvc.perform(
+                get("/user/byName/testUser"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username", is("testUser")))
+                .andExpect(jsonPath("$.password", is("testUserPassword")))
+                .andExpect(jsonPath("$.authorities", hasSize(1)))
+                .andExpect(jsonPath("$.authorities[0]", hasEntry("role", "USER")));
+    }
+
+    @Test
+    void ShouldReturnStatus404AndReturnNoUserReadUserByName() throws Exception {
+        String username = "testUser";
+        given(this.userRepository.findByUsername(username)).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                get("/user/byName/" + username))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with name " + username + " not exists"));
+    }
+
+    @Test
+    void ShouldReturnStatus200AndReturnUpdatedUserUpdateUser() throws Exception {
+        ApplicationUser user = new ApplicationUser("testUser", "testUserPassword");
+        ApplicationUser updatedUser = new ApplicationUser("testUpdatedUser", "testUpdatedUserPassword");
+
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(this.userRepository.save(updatedUser)).willReturn(updatedUser);
+
+        this.mockMvc.perform(
+                put("/user/123")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(objectMapper.writeValueAsString(updatedUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username", is("testUpdatedUser")))
+                .andExpect(jsonPath("$.password", is("testUpdatedUserPassword")))
+                .andExpect(jsonPath("$.authorities", hasSize(1)))
+                .andExpect(jsonPath("$.authorities[0]", hasEntry("role", "USER")));
+    }
+
+    @Test
+    void ShouldReturnStatus404AndReturnNoUserUpdateUser() throws Exception {
+        ApplicationUser updatedUser = new ApplicationUser("testUpdatedUser", "testUpdatedUserPassword");
+        String id = "123";
+
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                put("/user/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("utf-8")
+                        .content(objectMapper.writeValueAsString(updatedUser)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with id " + id + " not exists"));
+    }
+
+    @Test
+    void ShouldReturnStatus204DeleteUser() throws Exception {
+        ApplicationUser user = new ApplicationUser("testUser", "testUserPassword");
+        Long id = 123L;
+
+        given(this.userRepository.findById(id)).willReturn(Optional.of(user));
+
+        this.mockMvc.perform(
+                delete("/user/" + id))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void ShouldReturnStatus404DeleteUser() throws Exception {
+        ApplicationUser user = new ApplicationUser("testUser", "testUserPassword");
+        Long id = 123L;
+
+        given(this.userRepository.findById(id)).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                delete("/user/" + id))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User with id " + id + " not exists"));
     }
 }
