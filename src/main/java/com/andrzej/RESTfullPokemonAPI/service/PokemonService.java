@@ -1,7 +1,6 @@
 package com.andrzej.RESTfullPokemonAPI.service;
 
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
-import com.andrzej.RESTfullPokemonAPI.exceptions.PokemonNotFoundException;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PokemonService {
@@ -29,42 +33,58 @@ public class PokemonService {
         this.pokemonRepository = pokemonRepository;
     }
 
-    public EntityModel<Pokemon> createPokemon(Pokemon pokemon) {
-        return pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
+    public ResponseEntity<?> createPokemon(Pokemon pokemon) {
+        String pokemonName = pokemon.getPokemonName();
+        Optional<Pokemon> byPokemonName = pokemonRepository.findByPokemonName(pokemonName);
+
+        if (byPokemonName.isPresent())
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Pokemon with name: " + pokemonName + " already exists");
+
+        EntityModel<Pokemon> entityModel = pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
+        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
 
-    public PagedModel<EntityModel<Pokemon>> getAllPokemons(Pageable pageable) {
-//        if (pageable.getPageSize() >= 10){
-//            pageable = new PokemonPageable(pageable);
-//        }
-//        pokemonModelAssembler.setPageable(pageable);
+    public ResponseEntity<?> getAllPokemons(Pageable pageable) {
+        Page<Pokemon> pokemons = pokemonRepository.findAll(pageable);
 
-        return pagedResourcesAssembler.toModel(pokemonRepository.findAll(pageable), pokemonModelAssembler);
+        if (pokemons.getContent().size() == 0)
+            return ResponseEntity.noContent().build();
+
+        PagedModel<EntityModel<Pokemon>> entityModels = pagedResourcesAssembler.toModel(pokemons, pokemonModelAssembler);
+        return ResponseEntity.ok(entityModels);
     }
 
-    public EntityModel<Pokemon> getPokemonById(String id) {
-        return pokemonModelAssembler.toModel(pokemonRepository.findById(id).orElseThrow(() ->
-                new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
+    public ResponseEntity<?> getPokemonById(String id) {
+        Optional<Pokemon> pokemon = this.pokemonRepository.findById(id);
+        return pokemon.isPresent() ?
+                ResponseEntity.ok(pokemonModelAssembler.toModel(pokemon.get())) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
     }
 
-    public EntityModel<Pokemon> getPokemonByName(String name) {
-        return pokemonModelAssembler.toModel(pokemonRepository.findByPokemonName(name).orElseThrow(() ->
-                new PokemonNotFoundException("Pokemon with name: " + name + " not found")));
+    public ResponseEntity<?> getPokemonByName(String name) {
+        Optional<Pokemon> byPokemonName = pokemonRepository.findByPokemonName(name);
+        return byPokemonName.isPresent() ?
+                ResponseEntity.ok(pokemonModelAssembler.toModel(byPokemonName.get())) :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with name: " + name + " not exists");
+
     }
 
-    public EntityModel<Pokemon> updatePokemon(String id, Pokemon pokemon) {
-        Pokemon pokemon1 = pokemonRepository.findById(id).orElseThrow(() ->
-                new PokemonNotFoundException("Pokemon with id: " + id + " not found"));
-        pokemon.setId(pokemon1.getId());
-        return pokemonModelAssembler.toModel(pokemonRepository.save(pokemon));
+    public ResponseEntity<?> updatePokemon(String id, Pokemon pokemon) {
+        Optional<Pokemon> pokemonById = pokemonRepository.findById(id);
+        if (!pokemonById.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
+        }
+        pokemon.setId(id);
+        Pokemon save = pokemonRepository.save(pokemon);
+        return ResponseEntity.ok(pokemonModelAssembler.toModel(save));
     }
 
-    public void deletePokemon(String id) {
-        pokemonRepository.delete(pokemonRepository.findById(id).orElseThrow(() ->
-                new PokemonNotFoundException("Pokemon with id: " + id + " not found")));
-    }
-
-    public boolean isPokemonPresent(String pokemonName) {
-        return pokemonRepository.findByPokemonName(pokemonName).isPresent();
+    public ResponseEntity<?> deletePokemon(String id) {
+        Optional<Pokemon> pokemon = pokemonRepository.findById(id);
+        if (!pokemon.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
+        }
+        pokemonRepository.delete(pokemon.get());
+        return ResponseEntity.noContent().build();
     }
 }
