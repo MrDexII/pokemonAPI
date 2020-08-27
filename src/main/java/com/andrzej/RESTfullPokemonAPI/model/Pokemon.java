@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.util.List;
+import java.util.Objects;
 
 @Document("pokemon")
 @TypeAlias("pokemon")
@@ -72,5 +73,21 @@ public class Pokemon {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pokemon pokemon = (Pokemon) o;
+        return Objects.equals(id, pokemon.id) &&
+                Objects.equals(pokemonName, pokemon.pokemonName) &&
+                Objects.equals(imageUrl, pokemon.imageUrl) &&
+                Objects.equals(pokemonType, pokemon.pokemonType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, pokemonName, imageUrl, pokemonType);
     }
 }

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface DAORepository<T, E> {
 
-    T save(T user);
+    T save(T element);
 
     Optional<T> findById(E id);
 
@@ -13,6 +13,6 @@ public interface DAORepository<T, E> {
 
     List<T> findAll();
 
-    void delete(T user);
+    void delete(T element);
 
 }

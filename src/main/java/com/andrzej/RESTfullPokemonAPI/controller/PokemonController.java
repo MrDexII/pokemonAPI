@@ -4,10 +4,6 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,44 +22,33 @@ public class PokemonController {
     @PostMapping("/")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> createPokemon(@RequestBody Pokemon pokemon) {
-        String pokemonName = pokemon.getPokemonName();
-
-        if (pokemonService.isPokemonPresent(pokemonName)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Pokemon with name: " + pokemonName + " already exists");
-        }
-
-        EntityModel<Pokemon> entityModel = pokemonService.createPokemon(pokemon);
-        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+        return pokemonService.createPokemon(pokemon);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<PagedModel<EntityModel<Pokemon>>> getAllPokemons(Pageable pageable) {
-        return ResponseEntity.ok(pokemonService.getAllPokemons(pageable));
+    public ResponseEntity<?> getAllPokemons(Pageable pageable) {
+        return pokemonService.getAllPokemons(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Pokemon>> getPokemonById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(pokemonService.getPokemonById(id));
+    public ResponseEntity<?> getPokemonById(@PathVariable("id") String id) {
+        return pokemonService.getPokemonById(id);
     }
 
     @GetMapping("/find")
-    public ResponseEntity<EntityModel<Pokemon>> getPokemonByName(@RequestParam("name") String name) {
-        return ResponseEntity.ok(pokemonService.getPokemonByName(name));
+    public ResponseEntity<?> getPokemonByName(@RequestParam("name") String name) {
+        return pokemonService.getPokemonByName(name);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<EntityModel<Pokemon>> updatePokemon(@PathVariable("id") String id, @RequestBody Pokemon pokemon) {
-        EntityModel<Pokemon> entityModel = pokemonService.updatePokemon(id, pokemon);
-        return ResponseEntity
-                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(entityModel);
+    public ResponseEntity<?> updatePokemon(@PathVariable("id") String id, @RequestBody Pokemon pokemon) {
+        return pokemonService.updatePokemon(id, pokemon);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<HttpStatus> deletePokemon(@PathVariable("id") String id) {
-        pokemonService.deletePokemon(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletePokemon(@PathVariable("id") String id) {
+        return pokemonService.deletePokemon(id);
     }
 }
