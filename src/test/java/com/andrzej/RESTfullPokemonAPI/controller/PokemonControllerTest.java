@@ -38,7 +38,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PokemonController.class)
@@ -350,7 +349,6 @@ class PokemonControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
                         .content(objectMapper.writeValueAsString(pokemonAfterUpdate)))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with id: " + falseId + " not exists"));
 
