@@ -30,7 +30,7 @@ public class PokemonTypeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPokemonType(@PathVariable("id") String id) {
+    public ResponseEntity<?> getPokemonTypeById(@PathVariable("id") String id) {
         return pokemonTypeService.getPokemonType(id);
     }
 
