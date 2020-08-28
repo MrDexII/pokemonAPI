@@ -14,7 +14,7 @@ public class PokemonTypeModelAssembler implements RepresentationModelAssembler<P
     @Override
     public EntityModel<PokemonType> toModel(PokemonType pokemonType) {
         return new EntityModel<>(pokemonType,
-                linkTo(methodOn(PokemonTypeController.class).getPokemonType(pokemonType.getId())).withSelfRel(),
+                linkTo(methodOn(PokemonTypeController.class).getPokemonTypeById(pokemonType.getId())).withSelfRel(),
                 linkTo(methodOn(PokemonTypeController.class).getAllPokemonTypes()).withRel("allPokemonTypes"),
                 linkTo(methodOn(PokemonTypeController.class).deletePokemonType(pokemonType.getId())).withRel("deletePokemonType")
         );
