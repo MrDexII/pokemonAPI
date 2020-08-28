@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,7 +64,6 @@ class RoleControllerTest {
         given(this.roleRepository.findAll()).willReturn(roles);
 
         this.mockMvc.perform(get("/user/role/"))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(roles)));
     }
@@ -76,7 +74,6 @@ class RoleControllerTest {
         given(this.roleRepository.findAll()).willReturn(roles);
 
         this.mockMvc.perform(get("/user/role/"))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(roles)));
     }
