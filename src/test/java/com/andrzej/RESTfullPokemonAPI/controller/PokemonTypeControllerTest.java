@@ -115,7 +115,9 @@ class PokemonTypeControllerTest {
         PokemonType pokemonType1 = new PokemonType(new ObjectId(), "FIRE");
         PokemonType pokemonType2 = new PokemonType(new ObjectId(), "WATER");
 
-        List<PokemonType> listPokemonType = List.of(pokemonType1, pokemonType2);
+        List<PokemonType> listPokemonType = new ArrayList<>();
+        listPokemonType.add(pokemonType1);
+        listPokemonType.add(pokemonType2);
 
         String expectedDeleteSelfLink0 = "http://localhost/pokemon/type/" + listPokemonType.get(0).getId();
         String expectedDeleteSelfLink1 = "http://localhost/pokemon/type/" + listPokemonType.get(1).getId();

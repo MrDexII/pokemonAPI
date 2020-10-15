@@ -1,10 +1,13 @@
 package com.andrzej.RESTfullPokemonAPI.auth;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,7 +15,15 @@ import java.util.Set;
 @Table(name = "User")
 public class ApplicationUser implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "sequence-generator")
+    @GenericGenerator(
+            name = "sequence-generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @Parameter(name = "sequence_name", value = "user_sequence"),
+                    @Parameter(name = "initial_value", value = "3"),
+                    @Parameter(name = "increment_size", value = "1")
+            })
     private Long user_id;
     private String username;
     private String password;
@@ -48,7 +59,8 @@ public class ApplicationUser implements UserDetails {
                            String password) {
         this.username = username;
         this.password = password;
-        this.authorities = Set.of(new Role(2L, "USER"));
+        this.authorities = new HashSet<>();
+        authorities.add(new Role(2L, "USER"));
         this.isAccountNonExpired = true;
         this.isAccountNonLocked = true;
         this.isCredentialsNonExpired = true;

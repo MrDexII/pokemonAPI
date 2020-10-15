@@ -26,8 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
 
@@ -38,8 +36,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           RoleRepository roleRepository, SecretKey secretKey, JwtConfig jwtConfig) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.secretKey = secretKey;
         this.jwtConfig = jwtConfig;
     }
@@ -67,34 +63,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-        createAdminUser();
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(applicationUserService);
         return provider;
-    }
-
-    private void createAdminUser() {
-        if (!userRepository.existsById(1L)) {
-            if (!roleRepository.existsById(1L) || !roleRepository.existsById(2L)) {
-                Role adminRole = new Role(1L, "ADMIN");
-                Role userRole = new Role(2L, "USER");
-
-                roleRepository.save(adminRole);
-                roleRepository.save(userRole);
-
-                Set<Role> roles = Set.of(adminRole, userRole);
-
-                ApplicationUser user = new ApplicationUser(
-                        "admin",
-                        passwordEncoder.encode("admin"),
-                        roles,
-                        true,
-                        true,
-                        true,
-                        true);
-                userRepository.save(user);
-            }
-        }
     }
 }
