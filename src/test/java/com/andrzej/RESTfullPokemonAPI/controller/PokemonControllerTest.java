@@ -82,7 +82,8 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus201AndCreatePokemon() throws Exception {
-        List<PokemonType> pokemonTypes = List.of(new PokemonType(new ObjectId(), "Fire"));
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
@@ -113,11 +114,14 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus409CreatePokemon() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
 
         EntityModel<Pokemon> pokemonEntityModel = pokemonModelAssembler.toModel(pokemon);
 
@@ -134,22 +138,30 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus200AndReturnListOfPokemonsGetAllPokemons() throws Exception {
+        List<PokemonType> charizardPokemonTypes = new ArrayList<>();
+        charizardPokemonTypes.add(new PokemonType(new ObjectId(), "FIRE"));
+        charizardPokemonTypes.add(new PokemonType(new ObjectId(), "FLYING"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "charizardURLImage",
-                List.of(
-                        new PokemonType(new ObjectId(), "FIRE"),
-                        new PokemonType(new ObjectId(), "FLYING")
-                ));
+                charizardPokemonTypes
+        );
+
+        List<PokemonType> blastoisePokemonTypes = new ArrayList<>();
+        blastoisePokemonTypes.add(new PokemonType(new ObjectId(), "WATER"));
 
         Pokemon pokemon2 = new Pokemon(
                 new ObjectId(),
                 "blastoise",
                 "blastoiseURLImage",
-                List.of(new PokemonType(new ObjectId(), "WATER")));
+                blastoisePokemonTypes);
 
-        List<Pokemon> pokemons = List.of(pokemon, pokemon2);
+        List<Pokemon> pokemons = new ArrayList<>();
+        pokemons.add(pokemon);
+        pokemons.add(pokemon2);
+
         String expectedCharizardLink = "http://localhost/pokemon/" + pokemon.getId();
         String expectedBlastoiseLink = "http://localhost/pokemon/" + pokemon2.getId();
 
@@ -217,11 +229,14 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatusOKWhenIdIsCorrectGetPokemonById() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
 
         String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.getId();
 
@@ -256,11 +271,14 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus200WhenNameIsCorrectGetPokemonByName() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
 
         String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.getId();
 
@@ -295,18 +313,23 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus200AndReturnSavedPokemonUpdatePokemon() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemonBeforeUpdate = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
+        List<PokemonType> charizardUpdatedPokemonTypes = new ArrayList<>();
 
+        charizardUpdatedPokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        charizardUpdatedPokemonTypes.add(new PokemonType(new ObjectId(), "Flying"));
         Pokemon pokemonAfterUpdate = new Pokemon(
                 new ObjectId(),
                 "charizardUpdated",
                 "URLUpdated",
-                List.of(new PokemonType(new ObjectId(), "Fire"),
-                        new PokemonType(new ObjectId(), "Flying")));
+                charizardUpdatedPokemonTypes);
 
         String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemonAfterUpdate.getId();
 
@@ -333,12 +356,15 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus404UpdatePokemon() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Flying"));
+
         Pokemon pokemonAfterUpdate = new Pokemon(
                 new ObjectId(),
                 "charizardUpdated",
                 "URLUpdated",
-                List.of(new PokemonType(new ObjectId(), "Fire"),
-                        new PokemonType(new ObjectId(), "Flying")));
+                pokemonTypes);
 
         String falseId = new ObjectId().toString();
 
@@ -356,11 +382,14 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus204DeletePokemon() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
 
         given(this.pokemonRepository.findById(anyString())).willReturn(Optional.of(pokemon));
 
@@ -371,11 +400,14 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus404DeletePokemon() throws Exception {
+        List<PokemonType> pokemonTypes = new ArrayList<>();
+        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
                 "charizard",
                 "URL",
-                List.of(new PokemonType(new ObjectId(), "Fire")));
+                pokemonTypes);
 
         given(this.pokemonRepository.findById(anyString())).willReturn(Optional.empty());
 

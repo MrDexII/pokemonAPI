@@ -21,9 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.crypto.SecretKey;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -69,6 +67,9 @@ class UserControllerTest {
         Role userRole = new Role(2L, "USER");
         String encodePassword = "123abcEncoded";
 
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+
         ApplicationUser userGiven = new ApplicationUser();
         userGiven.setUsername("testUser");
         userGiven.setPassword("123abc");
@@ -76,7 +77,7 @@ class UserControllerTest {
         ApplicationUser userGivenAfterEncode = new ApplicationUser();
         userGivenAfterEncode.setUsername("testUser");
         userGivenAfterEncode.setPassword(encodePassword);
-        userGivenAfterEncode.setRoles(Set.of(userRole));
+        userGivenAfterEncode.setRoles(roles);
         userGivenAfterEncode.setAccountNonExpired(true);
         userGivenAfterEncode.setAccountNonLocked(true);
         userGivenAfterEncode.setCredentialsNonExpired(true);
@@ -86,7 +87,7 @@ class UserControllerTest {
         userThen.setUser_id(1L);
         userThen.setUsername("testUser");
         userThen.setPassword(encodePassword);
-        userThen.setRoles(Set.of(userRole));
+        userThen.setRoles(roles);
         userThen.setAccountNonExpired(true);
         userThen.setAccountNonLocked(true);
         userThen.setCredentialsNonExpired(true);
@@ -136,10 +137,11 @@ class UserControllerTest {
 
     @Test
     void ShouldReturnStatus200AndReturnListOfAllUsersReadAllUsers() throws Exception {
+        List<ApplicationUser> users = new ArrayList<>();
+        users.add(new ApplicationUser("testUser1", "testUser1Password"));
+        users.add(new ApplicationUser("testUser2", "testUser2Password"));
 
-        given(this.userRepository.findAll()).willReturn(List.of(
-                new ApplicationUser("testUser1", "testUser1Password"),
-                new ApplicationUser("testUser2", "testUser2Password")));
+        given(this.userRepository.findAll()).willReturn(users);
 
         this.mockMvc.perform(
                 get("/user/"))
@@ -156,7 +158,7 @@ class UserControllerTest {
     @Test
     void ShouldReturnStatus200AndReturnEmptyListOfUsersReadAllUsers() throws Exception {
 
-        given(this.userRepository.findAll()).willReturn(List.of());
+        given(this.userRepository.findAll()).willReturn(new ArrayList<>());
 
         this.mockMvc.perform(
                 get("/user/"))

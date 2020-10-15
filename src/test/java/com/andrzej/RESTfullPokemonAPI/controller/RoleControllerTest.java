@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.crypto.SecretKey;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -60,7 +61,10 @@ class RoleControllerTest {
 
     @Test
     public void shouldReturnStatusOkAndListOfRoles() throws Exception {
-        List<Role> roles = List.of(new Role(1L, "TestRole1"), new Role(2L, "TestRole2"));
+        List<Role> roles = new ArrayList<>();
+        roles.add(new Role(1L, "TestRole1"));
+        roles.add(new Role(2L, "TestRole2"));
+
         given(this.roleRepository.findAll()).willReturn(roles);
 
         this.mockMvc.perform(get("/user/role/"))
@@ -70,7 +74,7 @@ class RoleControllerTest {
 
     @Test
     public void shouldReturnStatusOkAndEmptyList() throws Exception {
-        List<Role> roles = List.of();
+        List<Role> roles = new ArrayList<>();
         given(this.roleRepository.findAll()).willReturn(roles);
 
         this.mockMvc.perform(get("/user/role/"))
