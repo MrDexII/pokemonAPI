@@ -100,7 +100,7 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(userGiven);
 
         this.mockMvc.perform(
-                post("/user/new")
+                post("/user/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent)
                         .characterEncoding("utf-8"))
@@ -127,7 +127,7 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(userGiven);
 
         this.mockMvc.perform(
-                post("/user/new")
+                post("/user/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent)
                         .characterEncoding("utf-8"))
@@ -198,7 +198,7 @@ class UserControllerTest {
         given(this.userRepository.findByUsername("testUser")).willReturn(Optional.of(user));
 
         this.mockMvc.perform(
-                get("/user/byName/testUser"))
+                get("/user/find").param("name", "testUser"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", is("testUser")))
                 .andExpect(jsonPath("$.password", is("testUserPassword")))
@@ -212,7 +212,7 @@ class UserControllerTest {
         given(this.userRepository.findByUsername(username)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/user/byName/" + username))
+                get("/user/find").param("name", username))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with name " + username + " not exists"));
     }

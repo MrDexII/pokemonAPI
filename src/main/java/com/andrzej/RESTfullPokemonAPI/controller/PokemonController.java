@@ -25,7 +25,7 @@ public class PokemonController {
         return pokemonService.createPokemon(pokemon);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public ResponseEntity<?> getAllPokemons(Pageable pageable) {
         return pokemonService.getAllPokemons(pageable);
     }

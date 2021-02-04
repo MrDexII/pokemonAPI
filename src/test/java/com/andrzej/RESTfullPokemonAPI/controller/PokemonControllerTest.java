@@ -176,7 +176,7 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
-                get("/pokemon/all")
+                get("/pokemon/")
                         .param("page", "0")
                         .param("size", "2"))
                 .andExpect(status().isOk())
@@ -203,7 +203,7 @@ class PokemonControllerTest {
                 .andExpect(jsonPath("$._embedded.pokemons[1]._links.self.href", is(expectedBlastoiseLink)))
                 .andExpect(jsonPath("$._embedded.pokemons[1]._links.delete.href", is(expectedBlastoiseLink)))
                 .andExpect(jsonPath("$._links.self.href",
-                        is("http://localhost/pokemon/all?page=" +
+                        is("http://localhost/pokemon/?page=" +
                                 pageable.getPageNumber() + "&size=" +
                                 pageable.getPageSize() + "")))
                 .andExpect(jsonPath("$.page.size", is(pageable.getPageSize())))
@@ -221,7 +221,7 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
-                get("/pokemon/all")
+                get("/pokemon/")
                         .param("page", "0")
                         .param("size", "2"))
                 .andExpect(status().isNoContent());
