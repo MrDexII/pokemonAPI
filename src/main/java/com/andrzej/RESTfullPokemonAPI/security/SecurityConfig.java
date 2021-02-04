@@ -1,39 +1,35 @@
 package com.andrzej.RESTfullPokemonAPI.security;
 
-import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
-import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
-import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtTokenVerifier;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtUserNameAndPasswordAuthenticationFilter;
-import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
-import java.util.Set;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
-    private final ApplicationUserService applicationUserService;
+    private final UserDetailsService applicationUserService;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
 
     @Autowired
     public SecurityConfig(PasswordEncoder passwordEncoder,
-                          ApplicationUserService applicationUserService,
-                          UserRepository userRepository,
-                          RoleRepository roleRepository, SecretKey secretKey, JwtConfig jwtConfig) {
+                          UserDetailsService applicationUserService,
+                          SecretKey secretKey,
+                          JwtConfig jwtConfig) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
         this.secretKey = secretKey;
@@ -51,13 +47,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtUserNameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUserNameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/user/new**").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/").permitAll()
                 .antMatchers("/user/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated();
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 

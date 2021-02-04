@@ -19,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/new")
+    @PostMapping("/")
     public ResponseEntity<?> createUser(@RequestBody ApplicationUser user) {
         return userService.createUser(user);
     }
@@ -34,8 +34,8 @@ public class UserController {
         return userService.findUserById(id);
     }
 
-    @GetMapping("/byName/{name}")
-    public ResponseEntity<?> readUserByName(@PathVariable("name") String name) {
+    @GetMapping("/find")
+    public ResponseEntity<?> readUserByName(@RequestParam("name") String name) {
         return userService.findUserByName(name);
     }
 
