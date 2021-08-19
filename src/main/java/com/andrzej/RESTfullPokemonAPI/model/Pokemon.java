@@ -16,63 +16,91 @@ import java.util.Objects;
 @Relation(collectionRelation = "pokemons", itemRelation = "pokemon")
 public class Pokemon {
     @Id
-    private ObjectId id;
-    private String pokemonName;
-    private String imageUrl;
-    @DBRef
-    private List<PokemonType> pokemonType;
+    private ObjectId _id;
+    private Integer number;
+    private String name;
+    private String fotoUrl;
+    private List<PokemonType> types;
+    private PokemonStats pokemonStats;
 
     public Pokemon() {
     }
 
-
-    @PersistenceConstructor
-    public Pokemon(ObjectId id, String pokemonName, String imageUrl, List<PokemonType> pokemonType) {
-        this.id = id;
-        this.pokemonName = pokemonName;
-        this.imageUrl = imageUrl;
-        this.pokemonType = pokemonType;
+    public Pokemon(Integer number, String name, String fotoUrl, List<PokemonType> types, PokemonStats pokemonStats) {
+        this.number = number;
+        this.name = name;
+        this.fotoUrl = fotoUrl;
+        this.types = types;
+        this.pokemonStats = pokemonStats;
     }
 
-    public String getId() {
-        return id.toString();
+    public Pokemon(ObjectId _id, Integer number, String name, String fotoUrl, List<PokemonType> types, PokemonStats pokemonStats) {
+        this._id = _id;
+        this.number = number;
+        this.name = name;
+        this.fotoUrl = fotoUrl;
+        this.types = types;
+        this.pokemonStats = pokemonStats;
     }
 
-    public void setId(String id) {
-        this.id = new ObjectId(id);
+    public ObjectId get_id() {
+        return _id;
     }
 
-    public String getPokemonName() {
-        return pokemonName;
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 
-    public void setPokemonName(String pokemonName) {
-        this.pokemonName = pokemonName;
+    public Integer getNumber() {
+        return number;
     }
 
-    public List<PokemonType> getPokemonType() {
-        return pokemonType;
+    public void setNumber(Integer number) {
+        this.number = number;
     }
 
-    public void setPokemonType(List<PokemonType> pokemonType) {
-        this.pokemonType = pokemonType;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+
+    public List<PokemonType> getTypes() {
+        return types;
+    }
+
+    public void setTypes(List<PokemonType> types) {
+        this.types = types;
+    }
+
+    public PokemonStats getPokemonStats() {
+        return pokemonStats;
+    }
+
+    public void setPokemonStats(PokemonStats pokemonStats) {
+        this.pokemonStats = pokemonStats;
     }
 
     @Override
     public String toString() {
         return "Pokemon{" +
-                "id='" + id + '\'' +
-                ", name='" + pokemonName + '\'' +
-                ", type=" + pokemonType +
+                "_id=" + _id +
+                ", number=" + number +
+                ", name='" + name + '\'' +
+                ", fotoUrl='" + fotoUrl + '\'' +
+                ", types=" + types +
+                ", pokemonStats=" + pokemonStats +
                 '}';
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     @Override
@@ -80,14 +108,11 @@ public class Pokemon {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pokemon pokemon = (Pokemon) o;
-        return Objects.equals(id, pokemon.id) &&
-                Objects.equals(pokemonName, pokemon.pokemonName) &&
-                Objects.equals(imageUrl, pokemon.imageUrl) &&
-                Objects.equals(pokemonType, pokemon.pokemonType);
+        return Objects.equals(_id, pokemon._id) && Objects.equals(number, pokemon.number) && Objects.equals(name, pokemon.name) && Objects.equals(fotoUrl, pokemon.fotoUrl) && Objects.equals(types, pokemon.types) && Objects.equals(pokemonStats, pokemon.pokemonStats);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, pokemonName, imageUrl, pokemonType);
+        return Objects.hash(_id, number, name, fotoUrl, types, pokemonStats);
     }
 }

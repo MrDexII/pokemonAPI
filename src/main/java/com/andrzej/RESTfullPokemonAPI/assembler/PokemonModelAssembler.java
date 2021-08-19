@@ -28,8 +28,8 @@ public class PokemonModelAssembler implements RepresentationModelAssembler<Pokem
 //                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete")
 //        );
         return new EntityModel<>(pokemon,
-                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel(),
-                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete"));
+                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.get_id().toString())).withSelfRel(),
+                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.get_id().toString())).withRel("delete"));
     }
 
 //    public void setPageable(Pageable pageable) {

@@ -4,7 +4,9 @@ import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
+import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
+import com.andrzej.RESTfullPokemonAPI.model.Stats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
@@ -82,88 +84,125 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus201AndCreatePokemon() throws Exception {
+        PokemonType fireType = new PokemonType(new ObjectId(), "Fire");
         List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        pokemonTypes.add(fireType);
+        PokemonStats pokemonStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                pokemonTypes,
+                pokemonStats);
 
         EntityModel<Pokemon> pokemonEntityModel = pokemonModelAssembler.toModel(pokemon);
-        String expectedURL = "http://localhost/pokemon/" + pokemon.getId();
+        String expectedURL = "http://localhost/pokemon/" + pokemon.get_id();
 
-        given(this.pokemonRepository.findByPokemonName(pokemon.getPokemonName())).willReturn(Optional.empty());
+        given(this.pokemonRepository.findByPokemonName(pokemon.getName())).willReturn(Optional.empty());
         given(this.pokemonRepository.save(pokemon)).willReturn(pokemon);
 
         this.mockMvc.perform(
-                post("/pokemon/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonEntityModel)))
+                        post("/pokemon/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonEntityModel)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(pokemon.getId())))
-                .andExpect(jsonPath("$.pokemonName", is("charizard")))
-                .andExpect(jsonPath("$.imageUrl", is("URL")))
-                .andExpect(jsonPath("$.pokemonType", hasSize(1)))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("name", "Fire")))
+//                .andExpect(jsonPath("$._id", is(pokemon.get_id())))
+                .andExpect(jsonPath("$.name", is("charizard")))
+                .andExpect(jsonPath("$.fotoUrl", is("URL")))
+                .andExpect(jsonPath("$.types", hasSize(1)))
+//                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getName().get(0).getId())))
+                .andExpect(jsonPath("$.types[0]", hasEntry("name", "Fire")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedURL)))
                 .andExpect(jsonPath("$._links.delete.href", is(expectedURL)));
     }
 
     @Test
     void ShouldReturnStatus409CreatePokemon() throws Exception {
+        PokemonType fireType = new PokemonType(new ObjectId(), "Fire");
         List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
-
+        pokemonTypes.add(fireType);
+        PokemonStats pokemonStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                pokemonTypes,
+                pokemonStats);
 
         EntityModel<Pokemon> pokemonEntityModel = pokemonModelAssembler.toModel(pokemon);
 
-        given(this.pokemonRepository.findByPokemonName(pokemon.getPokemonName())).willReturn(Optional.of(pokemon));
+        given(this.pokemonRepository.findByPokemonName(pokemon.getName())).willReturn(Optional.of(pokemon));
 
         this.mockMvc.perform(
-                post("/pokemon/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonEntityModel)))
+                        post("/pokemon/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonEntityModel)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("Pokemon with name: " + pokemon.getPokemonName() + " already exists"));
+                .andExpect(content().string("Pokemon with name: " + pokemon.getName() + " already exists"));
     }
 
     @Test
     void ShouldReturnStatus200AndReturnListOfPokemonsGetAllPokemons() throws Exception {
-        List<PokemonType> charizardPokemonTypes = new ArrayList<>();
-        charizardPokemonTypes.add(new PokemonType(new ObjectId(), "FIRE"));
-        charizardPokemonTypes.add(new PokemonType(new ObjectId(), "FLYING"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        charizardTypes.add(new PokemonType(new ObjectId(), "Flying"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "charizardURLImage",
-                charizardPokemonTypes
-        );
+                charizardTypes,
+                charizardTypesStats);
 
-        List<PokemonType> blastoisePokemonTypes = new ArrayList<>();
-        blastoisePokemonTypes.add(new PokemonType(new ObjectId(), "WATER"));
+        List<PokemonType> blastoiseTypes = new ArrayList<>();
+        blastoiseTypes.add(new PokemonType(new ObjectId(), "Water"));
+
+        PokemonStats blastoiseStats = new PokemonStats(
+                new Stats(79, 268, 362),
+                new Stats(83, 153, 291),
+                new Stats(100, 184, 328),
+                new Stats(85, 157, 295),
+                new Stats(105, 193, 339),
+                new Stats(78, 144, 280));
 
         Pokemon pokemon2 = new Pokemon(
                 new ObjectId(),
+                2,
                 "blastoise",
                 "blastoiseURLImage",
-                blastoisePokemonTypes);
+                blastoiseTypes,
+                blastoiseStats);
 
         List<Pokemon> pokemons = new ArrayList<>();
         pokemons.add(pokemon);
         pokemons.add(pokemon2);
 
-        String expectedCharizardLink = "http://localhost/pokemon/" + pokemon.getId();
-        String expectedBlastoiseLink = "http://localhost/pokemon/" + pokemon2.getId();
+        String expectedCharizardLink = "http://localhost/pokemon/" + pokemon.get_id();
+        String expectedBlastoiseLink = "http://localhost/pokemon/" + pokemon2.get_id();
 
         Pageable pageable = PageRequest.of(0, 2);
         int pageNumber = pageable.getPageNumber();
@@ -176,30 +215,30 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
-                get("/pokemon/")
-                        .param("page", "0")
-                        .param("size", "2"))
+                        get("/pokemon/")
+                                .param("page", "0")
+                                .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.pokemons", hasSize(2)))
-                .andExpect(jsonPath("$._embedded.pokemons[0].id", is(pokemons.get(0).getId())))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonName", is("charizard")))
-                .andExpect(jsonPath("$._embedded.pokemons[0].imageUrl", is("charizardURLImage")))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType", hasSize(2)))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[0]",
-                        hasEntry("id", pokemons.get(0).getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[0]", hasEntry("name", "FIRE")))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[1]",
-                        hasEntry("id", pokemons.get(0).getPokemonType().get(1).getId())))
-                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[1]", hasEntry("name", "FLYING")))
+//                .andExpect(jsonPath("$._embedded.pokemons[0]._id", is(pokemons.get(0).get_id())))
+                .andExpect(jsonPath("$._embedded.pokemons[0].name", is("charizard")))
+                .andExpect(jsonPath("$._embedded.pokemons[0].fotoUrl", is("charizardURLImage")))
+                .andExpect(jsonPath("$._embedded.pokemons[0].types", hasSize(2)))
+//                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[0]",
+//                        hasEntry("id", pokemons.get(0).getPokemonType().get(0).getId())))
+                .andExpect(jsonPath("$._embedded.pokemons[0].types[0]", hasEntry("name", "Fire")))
+//                .andExpect(jsonPath("$._embedded.pokemons[0].pokemonType[1]",
+//                        hasEntry("id", pokemons.get(0).getPokemonType().get(1).getId())))
+                .andExpect(jsonPath("$._embedded.pokemons[0].types[1]", hasEntry("name", "Flying")))
                 .andExpect(jsonPath("$._embedded.pokemons[0]._links.self.href", is(expectedCharizardLink)))
                 .andExpect(jsonPath("$._embedded.pokemons[0]._links.delete.href", is(expectedCharizardLink)))
-                .andExpect(jsonPath("$._embedded.pokemons[1].id", is(pokemons.get(1).getId())))
-                .andExpect(jsonPath("$._embedded.pokemons[1].pokemonName", is("blastoise")))
-                .andExpect(jsonPath("$._embedded.pokemons[1].imageUrl", is("blastoiseURLImage")))
-                .andExpect(jsonPath("$._embedded.pokemons[1].pokemonType", hasSize(1)))
-                .andExpect(jsonPath("$._embedded.pokemons[1].pokemonType[0]",
-                        hasEntry("id", pokemons.get(1).getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$._embedded.pokemons[1].pokemonType[0]", hasEntry("name", "WATER")))
+//                .andExpect(jsonPath("$._embedded.pokemons[1]._id", is(pokemons.get(1).get_id())))
+                .andExpect(jsonPath("$._embedded.pokemons[1].name", is("blastoise")))
+                .andExpect(jsonPath("$._embedded.pokemons[1].fotoUrl", is("blastoiseURLImage")))
+                .andExpect(jsonPath("$._embedded.pokemons[1].types", hasSize(1)))
+//                .andExpect(jsonPath("$._embedded.pokemons[1].pokemonType[0]",
+//                        hasEntry("id", pokemons.get(1).getPokemonType().get(0).getId())))
+                .andExpect(jsonPath("$._embedded.pokemons[1].types[0]", hasEntry("name", "Water")))
                 .andExpect(jsonPath("$._embedded.pokemons[1]._links.self.href", is(expectedBlastoiseLink)))
                 .andExpect(jsonPath("$._embedded.pokemons[1]._links.delete.href", is(expectedBlastoiseLink)))
                 .andExpect(jsonPath("$._links.self.href",
@@ -221,37 +260,47 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
-                get("/pokemon/")
-                        .param("page", "0")
-                        .param("size", "2"))
+                        get("/pokemon/")
+                                .param("page", "0")
+                                .param("size", "2"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void ShouldReturnStatusOKWhenIdIsCorrectGetPokemonById() throws Exception {
-        List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        charizardTypes.add(new PokemonType(new ObjectId(), "Flying"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                charizardTypes,
+                charizardTypesStats);
 
-        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.getId();
+        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.get_id();
 
-        given(this.pokemonRepository.findById(pokemon.getId())).willReturn(Optional.of(pokemon));
+        given(this.pokemonRepository.findById(pokemon.get_id().toString())).willReturn(Optional.of(pokemon));
 
 
         this.mockMvc.perform(
-                get("/pokemon/" + pokemon.getId()))
+                        get("/pokemon/" + pokemon.get_id().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemon.getId())))
-                .andExpect(jsonPath("$.pokemonName", is("charizard")))
-                .andExpect(jsonPath("$.imageUrl", is("URL")))
-                .andExpect(jsonPath("$.pokemonType", hasSize(1)))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("name", "Fire")))
+//                .andExpect(jsonPath("$._id", is(pokemon.get_id())))
+                .andExpect(jsonPath("$.name", is("charizard")))
+                .andExpect(jsonPath("$.fotoUrl", is("URL")))
+                .andExpect(jsonPath("$.types", hasSize(2)))
+//                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getPokemonType().get(0).getId())))
+                .andExpect(jsonPath("$.types[0]", hasEntry("name", "Fire")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedPokemonSelfDeleteLink)))
                 .andExpect(jsonPath("$._links.delete.href", is(expectedPokemonSelfDeleteLink)));
     }
@@ -263,7 +312,7 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findById(falseId)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/pokemon/" + falseId))
+                        get("/pokemon/" + falseId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with id: " + falseId + " not exists"));
 
@@ -271,29 +320,39 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus200WhenNameIsCorrectGetPokemonByName() throws Exception {
-        List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        charizardTypes.add(new PokemonType(new ObjectId(), "Flying"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                charizardTypes,
+                charizardTypesStats);
 
-        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.getId();
+        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemon.get_id();
 
         given(this.pokemonRepository.findByPokemonName(anyString())).willReturn(Optional.of(pokemon));
 
         this.mockMvc.perform(
-                get("/pokemon/find")
-                        .param("name", "charizard"))
+                        get("/pokemon/find")
+                                .param("name", "charizard"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemon.getId())))
-                .andExpect(jsonPath("$.pokemonName", is("charizard")))
-                .andExpect(jsonPath("$.imageUrl", is("URL")))
-                .andExpect(jsonPath("$.pokemonType", hasSize(1)))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("name", "Fire")))
+//                .andExpect(jsonPath("$._id", is(pokemon.get_id())))
+                .andExpect(jsonPath("$.name", is("charizard")))
+                .andExpect(jsonPath("$.fotoUrl", is("URL")))
+                .andExpect(jsonPath("$.types", hasSize(2)))
+//                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemon.getPokemonType().get(0).getId())))
+                .andExpect(jsonPath("$.types[0]", hasEntry("name", "Fire")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedPokemonSelfDeleteLink)))
                 .andExpect(jsonPath("$._links.delete.href", is(expectedPokemonSelfDeleteLink)));
     }
@@ -305,8 +364,8 @@ class PokemonControllerTest {
         given(this.pokemonRepository.findByPokemonName(anyString())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/pokemon/find")
-                        .param("name", notValidPokemonName))
+                        get("/pokemon/find")
+                                .param("name", notValidPokemonName))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with name: " + notValidPokemonName + " not exists"));
     }
@@ -316,65 +375,92 @@ class PokemonControllerTest {
         List<PokemonType> pokemonTypes = new ArrayList<>();
         pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
 
+        PokemonStats pokemonTypesBefore = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemonBeforeUpdate = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
-        List<PokemonType> charizardUpdatedPokemonTypes = new ArrayList<>();
+                pokemonTypes,
+                pokemonTypesBefore);
 
+        List<PokemonType> charizardUpdatedPokemonTypes = new ArrayList<>();
         charizardUpdatedPokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
         charizardUpdatedPokemonTypes.add(new PokemonType(new ObjectId(), "Flying"));
+
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemonAfterUpdate = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizardUpdated",
                 "URLUpdated",
-                charizardUpdatedPokemonTypes);
+                charizardUpdatedPokemonTypes,
+                charizardTypesStats);
 
-        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemonAfterUpdate.getId();
+        String expectedPokemonSelfDeleteLink = "http://localhost/pokemon/" + pokemonAfterUpdate.get_id();
 
-        given(this.pokemonRepository.findById(pokemonAfterUpdate.getId())).willReturn(Optional.of(pokemonBeforeUpdate));
+        given(this.pokemonRepository.findById(pokemonAfterUpdate.get_id().toString())).willReturn(Optional.of(pokemonBeforeUpdate));
         given(this.pokemonRepository.save(pokemonAfterUpdate)).willReturn(pokemonAfterUpdate);
 
         this.mockMvc.perform(
-                put("/pokemon/" + pokemonAfterUpdate.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonAfterUpdate)))
+                        put("/pokemon/" + pokemonAfterUpdate.get_id())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonAfterUpdate)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemonAfterUpdate.getId())))
-                .andExpect(jsonPath("$.pokemonName", is("charizardUpdated")))
-                .andExpect(jsonPath("$.imageUrl", is("URLUpdated")))
-                .andExpect(jsonPath("$.pokemonType", hasSize(2)))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemonAfterUpdate.getPokemonType().get(0).getId())))
-                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("name", "Fire")))
-                .andExpect(jsonPath("$.pokemonType[1]", hasEntry("id", pokemonAfterUpdate.getPokemonType().get(1).getId())))
-                .andExpect(jsonPath("$.pokemonType[1]", hasEntry("name", "Flying")))
+//                .andExpect(jsonPath("$._id", is(pokemonAfterUpdate.get_id())))
+                .andExpect(jsonPath("$.name", is("charizardUpdated")))
+                .andExpect(jsonPath("$.fotoUrl", is("URLUpdated")))
+                .andExpect(jsonPath("$.types", hasSize(2)))
+//                .andExpect(jsonPath("$.pokemonType[0]", hasEntry("id", pokemonAfterUpdate.getPokemonType().get(0).getId())))
+                .andExpect(jsonPath("$.types[0]", hasEntry("name", "Fire")))
+//                .andExpect(jsonPath("$.pokemonType[1]", hasEntry("id", pokemonAfterUpdate.getPokemonType().get(1).getId())))
+                .andExpect(jsonPath("$.types[1]", hasEntry("name", "Flying")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedPokemonSelfDeleteLink)))
                 .andExpect(jsonPath("$._links.delete.href", is(expectedPokemonSelfDeleteLink)));
     }
 
     @Test
     void ShouldReturnStatus404UpdatePokemon() throws Exception {
-        List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Flying"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemonAfterUpdate = new Pokemon(
                 new ObjectId(),
-                "charizardUpdated",
-                "URLUpdated",
-                pokemonTypes);
+                1,
+                "charizard",
+                "URL",
+                charizardTypes,
+                charizardTypesStats);
 
         String falseId = new ObjectId().toString();
 
         given(this.pokemonRepository.findById(anyString())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                put("/pokemon/" + falseId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonAfterUpdate)))
+                        put("/pokemon/" + falseId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonAfterUpdate)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with id: " + falseId + " not exists"));
 
@@ -382,38 +468,56 @@ class PokemonControllerTest {
 
     @Test
     void ShouldReturnStatus204DeletePokemon() throws Exception {
-        List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                charizardTypes,
+                charizardTypesStats);
 
         given(this.pokemonRepository.findById(anyString())).willReturn(Optional.of(pokemon));
 
         this.mockMvc.perform(
-                delete("/pokemon/" + pokemon.getId()))
+                        delete("/pokemon/" + pokemon.get_id()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void ShouldReturnStatus404DeletePokemon() throws Exception {
-        List<PokemonType> pokemonTypes = new ArrayList<>();
-        pokemonTypes.add(new PokemonType(new ObjectId(), "Fire"));
+        List<PokemonType> charizardTypes = new ArrayList<>();
+        charizardTypes.add(new PokemonType(new ObjectId(), "Fire"));
 
+        PokemonStats charizardTypesStats = new PokemonStats(
+                new Stats(78, 266, 360),
+                new Stats(84, 155, 293),
+                new Stats(78, 144, 280),
+                new Stats(109, 200, 348),
+                new Stats(85, 157, 295),
+                new Stats(100, 184, 328));
         Pokemon pokemon = new Pokemon(
                 new ObjectId(),
+                1,
                 "charizard",
                 "URL",
-                pokemonTypes);
+                charizardTypes,
+                charizardTypesStats);
 
         given(this.pokemonRepository.findById(anyString())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                delete("/pokemon/" + pokemon.getId()))
+                        delete("/pokemon/" + pokemon.get_id()))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Pokemon with id: " + pokemon.getId() + " not exists"));
+                .andExpect(content().string("Pokemon with id: " + pokemon.get_id() + " not exists"));
     }
 }
