@@ -66,7 +66,7 @@ public class PokemonTypeService {
         if (!pokemonTypeRepository.findById(id).isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon type with id: " + id + " not exists");
         }
-        pokemonType.setId(id);
+        pokemonType.set_id(id);
         return ResponseEntity.ok(pokemonTypeModelAssembler.toModel(pokemonTypeRepository.save(pokemonType)));
     }
 

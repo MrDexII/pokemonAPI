@@ -77,18 +77,18 @@ class PokemonTypeControllerTest {
     void ShouldReturnStatus201AndReturnSavedPokemonCreatePokemonType() throws Exception {
         PokemonType pokemonType = new PokemonType(new ObjectId(), "NORMAL");
 
-        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.getId();
+        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.get_id();
         String expectedAllPokemonTypesLink = "http://localhost/pokemon/type/";
         given(this.pokemonTypeRepository.save(pokemonType)).willReturn(pokemonType);
         given(this.pokemonTypeRepository.findByName(pokemonType.getName())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                post("/pokemon/type/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonType)))
+                        post("/pokemon/type/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonType)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(pokemonType.getId())))
+                .andExpect(jsonPath("$._id", is(pokemonType.get_id())))
                 .andExpect(jsonPath("$.name", is("NORMAL")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedDeleteSelfLink)))
                 .andExpect(jsonPath("$._links.deletePokemonType.href", is(expectedDeleteSelfLink)))
@@ -102,10 +102,10 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findByName(pokemonType.getName())).willReturn(Optional.of(pokemonType));
 
         this.mockMvc.perform(
-                post("/pokemon/type/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonType)))
+                        post("/pokemon/type/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonType)))
                 .andExpect(status().isConflict())
                 .andExpect(content().string("Pokemon type with name: " + pokemonType.getName() + " already exists"));
     }
@@ -119,18 +119,18 @@ class PokemonTypeControllerTest {
         listPokemonType.add(pokemonType1);
         listPokemonType.add(pokemonType2);
 
-        String expectedDeleteSelfLink0 = "http://localhost/pokemon/type/" + listPokemonType.get(0).getId();
-        String expectedDeleteSelfLink1 = "http://localhost/pokemon/type/" + listPokemonType.get(1).getId();
+        String expectedDeleteSelfLink0 = "http://localhost/pokemon/type/" + listPokemonType.get(0).get_id();
+        String expectedDeleteSelfLink1 = "http://localhost/pokemon/type/" + listPokemonType.get(1).get_id();
         String expectedAllPokemonTypesLink = "http://localhost/pokemon/type/";
 
         given(this.pokemonTypeRepository.findAll()).willReturn(listPokemonType);
 
         this.mockMvc.perform(
-                get("/pokemon/type/"))
+                        get("/pokemon/type/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.pokemonTypeList", hasSize(2)))
-                .andExpect(jsonPath("$._embedded.pokemonTypeList[0].id",
-                        is(listPokemonType.get(0).getId())))
+                .andExpect(jsonPath("$._embedded.pokemonTypeList[0]._id",
+                        is(listPokemonType.get(0).get_id())))
                 .andExpect(jsonPath("$._embedded.pokemonTypeList[0].name", is("FIRE")))
                 .andExpect(jsonPath("$._embedded.pokemonTypeList[0]._links.self.href",
                         is(expectedDeleteSelfLink0)))
@@ -138,8 +138,8 @@ class PokemonTypeControllerTest {
                         is(expectedDeleteSelfLink0)))
                 .andExpect(jsonPath("$._embedded.pokemonTypeList[0]._links.allPokemonTypes.href",
                         is(expectedAllPokemonTypesLink)))
-                .andExpect(jsonPath("$._embedded.pokemonTypeList[1].id",
-                        is(listPokemonType.get(1).getId())))
+                .andExpect(jsonPath("$._embedded.pokemonTypeList[1]._id",
+                        is(listPokemonType.get(1).get_id())))
                 .andExpect(jsonPath("$._embedded.pokemonTypeList[1].name", is("WATER")))
                 .andExpect(jsonPath("$._embedded.pokemonTypeList[1]._links.self.href",
                         is(expectedDeleteSelfLink1)))
@@ -156,7 +156,7 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findAll()).willReturn(listPokemonType);
 
         this.mockMvc.perform(
-                get("/pokemon/type/"))
+                        get("/pokemon/type/"))
                 .andExpect(status().isNoContent());
     }
 
@@ -164,15 +164,15 @@ class PokemonTypeControllerTest {
     void ShouldReturnStatus200AndReturnPokemonTypeGetPokemonTypeById() throws Exception {
         PokemonType pokemonType = new PokemonType(new ObjectId(), "NORMAL");
 
-        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.getId();
+        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.get_id();
         String expectedAllPokemonTypesLink = "http://localhost/pokemon/type/";
 
-        given(this.pokemonTypeRepository.findById(pokemonType.getId())).willReturn(Optional.of(pokemonType));
+        given(this.pokemonTypeRepository.findById(pokemonType.get_id().toString())).willReturn(Optional.of(pokemonType));
 
         this.mockMvc.perform(
-                get("/pokemon/type/" + pokemonType.getId()))
+                        get("/pokemon/type/" + pokemonType.get_id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemonType.getId())))
+                .andExpect(jsonPath("$._id", is(pokemonType.get_id())))
                 .andExpect(jsonPath("$.name", is("NORMAL")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedDeleteSelfLink)))
                 .andExpect(jsonPath("$._links.deletePokemonType.href", is(expectedDeleteSelfLink)))
@@ -185,7 +185,7 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findById(pokemonTypeId)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/pokemon/type/" + pokemonTypeId))
+                        get("/pokemon/type/" + pokemonTypeId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon type with id: " + pokemonTypeId + " not exists"));
     }
@@ -194,16 +194,16 @@ class PokemonTypeControllerTest {
     void ShouldReturnStatus200AndReturnPokemonTypeGetPokemonTypeByName() throws Exception {
         PokemonType pokemonType = new PokemonType(new ObjectId(), "NORMAL");
 
-        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.getId();
+        String expectedDeleteSelfLink = "http://localhost/pokemon/type/" + pokemonType.get_id();
         String expectedAllPokemonTypesLink = "http://localhost/pokemon/type/";
 
         given(this.pokemonTypeRepository.findByName(pokemonType.getName())).willReturn(Optional.of(pokemonType));
 
         this.mockMvc.perform(
-                get("/pokemon/type/find")
-                        .param("name", pokemonType.getName()))
+                        get("/pokemon/type/find")
+                                .param("name", pokemonType.getName()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemonType.getId())))
+                .andExpect(jsonPath("$._id", is(pokemonType.get_id())))
                 .andExpect(jsonPath("$.name", is("NORMAL")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedDeleteSelfLink)))
                 .andExpect(jsonPath("$._links.deletePokemonType.href", is(expectedDeleteSelfLink)))
@@ -217,8 +217,8 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findByName(pokemonName)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/pokemon/type/find")
-                        .param("name", pokemonName))
+                        get("/pokemon/type/find")
+                                .param("name", pokemonName))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon type with name: " + pokemonName + " not exists"));
     }
@@ -236,12 +236,12 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.save(pokemonTypeAfterUpdate)).willReturn(pokemonTypeAfterUpdate);
 
         this.mockMvc.perform(
-                put("/pokemon/type/" + pokemonId.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonTypeAfterUpdate)))
+                        put("/pokemon/type/" + pokemonId.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonTypeAfterUpdate)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(pokemonTypeAfterUpdate.getId())))
+                .andExpect(jsonPath("$._id", is(pokemonTypeAfterUpdate.get_id())))
                 .andExpect(jsonPath("$.name", is("NORMALUpdated")))
                 .andExpect(jsonPath("$._links.self.href", is(expectedDeleteSelfLink)))
                 .andExpect(jsonPath("$._links.deletePokemonType.href", is(expectedDeleteSelfLink)))
@@ -256,10 +256,10 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findById(pokemonId.toString())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                put("/pokemon/type/" + pokemonId.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(pokemonTypeAfterUpdate)))
+                        put("/pokemon/type/" + pokemonId.toString())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(pokemonTypeAfterUpdate)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon type with id: " + pokemonId.toString() + " not exists"));
     }
@@ -272,7 +272,7 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findById(pokemonTypeId.toString())).willReturn(Optional.of(pokemonType));
 
         this.mockMvc.perform(
-                delete("/pokemon/type/" + pokemonTypeId.toString()))
+                        delete("/pokemon/type/" + pokemonTypeId.toString()))
                 .andExpect(status().isNoContent());
     }
 
@@ -283,7 +283,7 @@ class PokemonTypeControllerTest {
         given(this.pokemonTypeRepository.findById(pokemonTypeId)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                delete("/pokemon/type/" + pokemonTypeId))
+                        delete("/pokemon/type/" + pokemonTypeId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon type with id: " + pokemonTypeId + " not exists"));
     }

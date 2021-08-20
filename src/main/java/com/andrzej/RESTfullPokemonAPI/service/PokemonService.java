@@ -3,7 +3,6 @@ package com.andrzej.RESTfullPokemonAPI.service;
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +35,7 @@ public class PokemonService {
 
     public ResponseEntity<?> createPokemon(Pokemon pokemon) {
         String pokemonName = pokemon.getName();
-        Optional<Pokemon> byPokemonName = pokemonRepository.findByPokemonName(pokemonName);
+        Optional<Pokemon> byPokemonName = pokemonRepository.findByName(pokemonName);
 
         if (byPokemonName.isPresent())
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Pokemon with name: " + pokemonName + " already exists");
@@ -63,7 +62,7 @@ public class PokemonService {
     }
 
     public ResponseEntity<?> getPokemonByName(String name) {
-        Optional<Pokemon> byPokemonName = pokemonRepository.findByPokemonName(name);
+        Optional<Pokemon> byPokemonName = pokemonRepository.findByName(name);
         return byPokemonName.isPresent() ?
                 ResponseEntity.ok(pokemonModelAssembler.toModel(byPokemonName.get())) :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with name: " + name + " not exists");
@@ -75,7 +74,7 @@ public class PokemonService {
         if (!pokemonById.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
         }
-        pokemon.set_id(new ObjectId(id));
+        pokemon.set_id(id);
         Pokemon save = pokemonRepository.save(pokemon);
         return ResponseEntity.ok(pokemonModelAssembler.toModel(save));
     }

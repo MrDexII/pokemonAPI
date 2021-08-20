@@ -100,10 +100,10 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(userGiven);
 
         this.mockMvc.perform(
-                post("/user/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonContent)
-                        .characterEncoding("utf-8"))
+                        post("/user/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonContent)
+                                .characterEncoding("utf-8"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.user_id", is(1)))
                 .andExpect(jsonPath("$.username", is("testUser")))
@@ -127,10 +127,10 @@ class UserControllerTest {
         String jsonContent = objectMapper.writeValueAsString(userGiven);
 
         this.mockMvc.perform(
-                post("/user/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonContent)
-                        .characterEncoding("utf-8"))
+                        post("/user/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonContent)
+                                .characterEncoding("utf-8"))
                 .andExpect(status().isConflict())
                 .andExpect(content().string("User with name " + userGiven.getUsername() + " already exists"));
     }
@@ -144,7 +144,7 @@ class UserControllerTest {
         given(this.userRepository.findAll()).willReturn(users);
 
         this.mockMvc.perform(
-                get("/user/"))
+                        get("/user/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0]", hasEntry("username", "testUser1")))
@@ -161,7 +161,7 @@ class UserControllerTest {
         given(this.userRepository.findAll()).willReturn(new ArrayList<>());
 
         this.mockMvc.perform(
-                get("/user/"))
+                        get("/user/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -173,7 +173,7 @@ class UserControllerTest {
         given(this.userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
         this.mockMvc.perform(
-                get("/user/123"))
+                        get("/user/123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", is("testUser")))
                 .andExpect(jsonPath("$.password", is("testUserPassword")))
@@ -186,7 +186,7 @@ class UserControllerTest {
         given(this.userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/user/123"))
+                        get("/user/123"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with id " + 123L + " not exists"));
     }
@@ -198,7 +198,7 @@ class UserControllerTest {
         given(this.userRepository.findByUsername("testUser")).willReturn(Optional.of(user));
 
         this.mockMvc.perform(
-                get("/user/find").param("name", "testUser"))
+                        get("/user/find").param("name", "testUser"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", is("testUser")))
                 .andExpect(jsonPath("$.password", is("testUserPassword")))
@@ -212,7 +212,7 @@ class UserControllerTest {
         given(this.userRepository.findByUsername(username)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                get("/user/find").param("name", username))
+                        get("/user/find").param("name", username))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with name " + username + " not exists"));
     }
@@ -226,10 +226,10 @@ class UserControllerTest {
         given(this.userRepository.save(updatedUser)).willReturn(updatedUser);
 
         this.mockMvc.perform(
-                put("/user/123")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(updatedUser)))
+                        put("/user/123")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", is("testUpdatedUser")))
                 .andExpect(jsonPath("$.password", is("testUpdatedUserPassword")))
@@ -245,10 +245,10 @@ class UserControllerTest {
         given(this.userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                put("/user/" + id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(updatedUser)))
+                        put("/user/" + id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8")
+                                .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with id " + id + " not exists"));
     }
@@ -261,7 +261,7 @@ class UserControllerTest {
         given(this.userRepository.findById(id)).willReturn(Optional.of(user));
 
         this.mockMvc.perform(
-                delete("/user/" + id))
+                        delete("/user/" + id))
                 .andExpect(status().isNoContent());
     }
 
@@ -273,7 +273,7 @@ class UserControllerTest {
         given(this.userRepository.findById(id)).willReturn(Optional.empty());
 
         this.mockMvc.perform(
-                delete("/user/" + id))
+                        delete("/user/" + id))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User with id " + id + " not exists"));
     }

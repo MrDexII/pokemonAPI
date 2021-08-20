@@ -3,30 +3,25 @@ package com.andrzej.RESTfullPokemonAPI.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.hateoas.server.core.Relation;
 
 import java.util.List;
 import java.util.Objects;
 
 @Document("pokemon")
-@TypeAlias("pokemon")
-@Relation(collectionRelation = "pokemons", itemRelation = "pokemon")
 public class Pokemon {
     @Id
     private ObjectId _id;
     private Integer number;
     private String name;
     private String fotoUrl;
-    private List<PokemonType> types;
+    private List<String> types;
     private PokemonStats pokemonStats;
 
     public Pokemon() {
     }
 
-    public Pokemon(Integer number, String name, String fotoUrl, List<PokemonType> types, PokemonStats pokemonStats) {
+    public Pokemon(Integer number, String name, String fotoUrl, List<String> types, PokemonStats pokemonStats) {
         this.number = number;
         this.name = name;
         this.fotoUrl = fotoUrl;
@@ -34,7 +29,8 @@ public class Pokemon {
         this.pokemonStats = pokemonStats;
     }
 
-    public Pokemon(ObjectId _id, Integer number, String name, String fotoUrl, List<PokemonType> types, PokemonStats pokemonStats) {
+    @PersistenceConstructor
+    public Pokemon(ObjectId _id, Integer number, String name, String fotoUrl, List<String> types, PokemonStats pokemonStats) {
         this._id = _id;
         this.number = number;
         this.name = name;
@@ -43,12 +39,12 @@ public class Pokemon {
         this.pokemonStats = pokemonStats;
     }
 
-    public ObjectId get_id() {
-        return _id;
+    public String get_id() {
+        return this._id.toString();
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    public void set_id(String _id) {
+        this._id = new ObjectId(_id);
     }
 
     public Integer getNumber() {
@@ -75,11 +71,11 @@ public class Pokemon {
         this.fotoUrl = fotoUrl;
     }
 
-    public List<PokemonType> getTypes() {
+    public List<String> getTypes() {
         return types;
     }
 
-    public void setTypes(List<PokemonType> types) {
+    public void setTypes(List<String> types) {
         this.types = types;
     }
 

@@ -2,7 +2,6 @@ package com.andrzej.RESTfullPokemonAPI.assembler;
 
 import com.andrzej.RESTfullPokemonAPI.controller.PokemonController;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -28,8 +27,8 @@ public class PokemonModelAssembler implements RepresentationModelAssembler<Pokem
 //                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete")
 //        );
         return new EntityModel<>(pokemon,
-                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.get_id().toString())).withSelfRel(),
-                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.get_id().toString())).withRel("delete"));
+                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.get_id())).withSelfRel(),
+                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.get_id())).withRel("delete"));
     }
 
 //    public void setPageable(Pageable pageable) {
