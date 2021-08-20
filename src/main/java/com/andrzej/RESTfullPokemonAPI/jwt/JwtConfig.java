@@ -1,8 +1,8 @@
 package com.andrzej.RESTfullPokemonAPI.jwt;
 
-import com.google.common.net.HttpHeaders;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 
 @Configuration
 @ConfigurationProperties(prefix = "application.jwt")
