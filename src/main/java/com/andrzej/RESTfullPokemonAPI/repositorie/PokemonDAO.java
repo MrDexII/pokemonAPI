@@ -24,9 +24,9 @@ public class PokemonDAO implements PokemonRepository {
     }
 
     @Override
-    public Optional<Pokemon> findByPokemonName(String name) {
+    public Optional<Pokemon> findByName(String name) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("pokemonName").is(name));
+        query.addCriteria(Criteria.where("name").is(name));
         return Optional.ofNullable(mongoTemplate.findOne(query, Pokemon.class));
     }
 

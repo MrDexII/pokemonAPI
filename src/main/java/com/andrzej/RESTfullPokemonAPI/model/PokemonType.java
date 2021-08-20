@@ -3,33 +3,35 @@ package com.andrzej.RESTfullPokemonAPI.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
 @Document("type")
-@TypeAlias("type")
 public class PokemonType {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
     private String name;
 
     public PokemonType() {
     }
 
-    @PersistenceConstructor
-    public PokemonType(ObjectId id, String name) {
-        this.id = id;
+    public PokemonType(String name) {
         this.name = name;
     }
 
-    public String getId() {
-        return id.toString();
+    @PersistenceConstructor
+    public PokemonType(ObjectId _id, String name) {
+        this._id = _id;
+        this.name = name;
     }
 
-    public void setId(String id) {
-        this.id = new ObjectId(id);
+    public String get_id() {
+        return this._id.toString();
+    }
+
+    public void set_id(String _id) {
+        this._id = new ObjectId(_id);
     }
 
     public String getName() {
@@ -42,8 +44,8 @@ public class PokemonType {
 
     @Override
     public String toString() {
-        return "Type{" +
-                "id='" + id + '\'' +
+        return "PokemonType{" +
+                "_id=" + _id +
                 ", name='" + name + '\'' +
                 '}';
     }
@@ -53,13 +55,12 @@ public class PokemonType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PokemonType that = (PokemonType) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name);
+        return Objects.equals(_id, that._id) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(_id, name);
     }
 }
 
