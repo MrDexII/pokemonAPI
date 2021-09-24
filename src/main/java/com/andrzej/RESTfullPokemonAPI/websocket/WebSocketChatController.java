@@ -6,8 +6,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
-import java.security.Principal;
-
 @Controller
 public class WebSocketChatController {
     private final SessionService sessionService;
@@ -25,7 +23,7 @@ public class WebSocketChatController {
     @MessageMapping("/chat.newUser")
     @SendTo("/topic/andrewChat")
     public WebSocketChatMessage newUser(@Payload WebSocketChatMessage webSocketChatMessage,
-                                        SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+                                        SimpMessageHeaderAccessor headerAccessor) {
         sessionService.addUser(new UserSession(headerAccessor.getSessionId(), webSocketChatMessage.getSender()));
         headerAccessor.getSessionAttributes().put("username", webSocketChatMessage.getSender());
         webSocketChatMessage.setUserSessionsList(sessionService.getUserSessionsList());
