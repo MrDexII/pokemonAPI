@@ -5,10 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.security.Principal;
 
 @Component
 public class WebSocketChatEventListener {
@@ -31,16 +32,15 @@ public class WebSocketChatEventListener {
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
+        Principal principal = (Principal) headerAccessor.getMessageHeaders().get("simpUser");
+        String username = principal.getName();
         if (username != null) {
             sessionService.deleteUserByUserName(username);
             WebSocketChatMessage chatMessage = new WebSocketChatMessage();
             chatMessage.setType("Leave");
             chatMessage.setSender(username);
             chatMessage.setUserSessionsList(sessionService.getUserSessionsList());
-
-            messageTemplate.convertAndSend("/topic/public", chatMessage);
+            messageTemplate.convertAndSend("/topic/gameChat", chatMessage);
         }
     }
 }
