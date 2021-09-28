@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationUtils {
 
     public static void setAuthenticationBasedOnToken(String token, SecretKey secretKey) {
+        if (token == null || token.length() <= 6) throw new IllegalArgumentException("Token can't be empty");
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
