@@ -32,17 +32,31 @@ public class WebSocketChatController {
                                         Principal principal) {
         sessionService.addUser(new UserSession(headerAccessor.getSessionId(), principal.getName()));
         webSocketChatMessage.setUserSessionsList(sessionService.getUserSessionsList());
+        webSocketChatMessage.setUserSessionId(headerAccessor.getSessionId());
+        webSocketChatMessage.setSender(principal.getName());
         return webSocketChatMessage;
     }
 
-    @MessageMapping("/chat.sendToUser")
-    public void sendToUser(@Payload WebSocketChatMessage webSocketChatMessage) {
-        WebSocketChatMessage chatMessage = new WebSocketChatMessage();
-        chatMessage.setType("message");
-        chatMessage.setContent("User " + webSocketChatMessage.getSender() + " want's to play");
+    @MessageMapping("/chat.sendRequestForPlayToUser")
+    public void sendToUser(@Payload WebSocketChatMessage webSocketChatMessage,
+                           SimpMessageHeaderAccessor headerAccessor,
+                           Principal principal) {
 
-        if (webSocketChatMessage.getType().equals("battleRequest")) {
-            messageSendingTemplate.convertAndSend("/topic/users-user" + webSocketChatMessage.getContent(), chatMessage);
+        String userSessionIdToSend = webSocketChatMessage.getUserSessionId();
+        webSocketChatMessage.setUserSessionId(headerAccessor.getSessionId());
+
+        switch (webSocketChatMessage.getType()) {
+            case "battleRequest", "negativeBattleRequest" -> messageSendingTemplate.convertAndSend(
+                    "/topic/users-user" + userSessionIdToSend,
+                    webSocketChatMessage);
+            case "positiveBattleRequest" -> {
+                messageSendingTemplate.convertAndSend(
+                        "/topic/users-user" + webSocketChatMessage.getUserSessionId(),
+                        webSocketChatMessage);
+                messageSendingTemplate.convertAndSend(
+                        "/topic/users-user" + userSessionIdToSend,
+                        webSocketChatMessage);
+            }
         }
     }
 }

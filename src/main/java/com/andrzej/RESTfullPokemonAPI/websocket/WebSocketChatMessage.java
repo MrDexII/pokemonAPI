@@ -3,6 +3,7 @@ package com.andrzej.RESTfullPokemonAPI.websocket;
 import java.util.Set;
 
 public class WebSocketChatMessage {
+    private String userSessionId;
     private String type;
     private String content;
     private String sender;
@@ -10,6 +11,14 @@ public class WebSocketChatMessage {
 
     public Set<UserSession> getUserSessionsList() {
         return userSessionsList;
+    }
+
+    public String getUserSessionId() {
+        return userSessionId;
+    }
+
+    public void setUserSessionId(String userSessionId) {
+        this.userSessionId = userSessionId;
     }
 
     public void setUserSessionsList(Set<UserSession> userSessionsList) {
