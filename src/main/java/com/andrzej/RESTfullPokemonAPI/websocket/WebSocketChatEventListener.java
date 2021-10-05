@@ -25,8 +25,7 @@ public class WebSocketChatEventListener {
 
     @EventListener
     public void handleWebSocketConnectionListener(SessionConnectedEvent event) {
-        logger.info("Received a new web socket connection");
-        logger.info("EVENT: " + event.toString());
+        logger.info("Received a new web socket connection "+ event.toString());
     }
 
     @EventListener

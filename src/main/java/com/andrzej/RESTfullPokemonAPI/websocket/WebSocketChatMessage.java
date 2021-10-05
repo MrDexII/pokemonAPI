@@ -8,6 +8,7 @@ public class WebSocketChatMessage {
     private String content;
     private String sender;
     private Set<UserSession> userSessionsList;
+    private RGBColor color;
 
     public Set<UserSession> getUserSessionsList() {
         return userSessionsList;
@@ -47,5 +48,13 @@ public class WebSocketChatMessage {
 
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public RGBColor getColor() {
+        return color;
+    }
+
+    public void setColor(RGBColor color) {
+        this.color = color;
     }
 }

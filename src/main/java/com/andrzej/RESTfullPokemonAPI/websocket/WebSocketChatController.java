@@ -30,10 +30,12 @@ public class WebSocketChatController {
     public WebSocketChatMessage newUser(@Payload WebSocketChatMessage webSocketChatMessage,
                                         SimpMessageHeaderAccessor headerAccessor,
                                         Principal principal) {
-        sessionService.addUser(new UserSession(headerAccessor.getSessionId(), principal.getName()));
+        UserSession userSession = new UserSession(headerAccessor.getSessionId(), principal.getName());
+        sessionService.addUser(userSession);
         webSocketChatMessage.setUserSessionsList(sessionService.getUserSessionsList());
         webSocketChatMessage.setUserSessionId(headerAccessor.getSessionId());
         webSocketChatMessage.setSender(principal.getName());
+        webSocketChatMessage.setColor(userSession.getColor());
         return webSocketChatMessage;
     }
 
