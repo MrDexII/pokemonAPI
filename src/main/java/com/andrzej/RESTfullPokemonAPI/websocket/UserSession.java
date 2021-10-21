@@ -7,6 +7,7 @@ public class UserSession {
     private String sessionId;
     private String username;
     private RGBColor color;
+    private Boolean ready;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
@@ -45,12 +46,21 @@ public class UserSession {
         return color;
     }
 
+    public Boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(Boolean ready) {
+        this.ready = ready;
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +
                 "sessionId='" + sessionId + '\'' +
                 ", username='" + username + '\'' +
                 ", color=" + color +
+                ", ready=" + ready +
                 '}';
     }
 }

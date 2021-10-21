@@ -3,6 +3,7 @@ package com.andrzej.RESTfullPokemonAPI.websocket;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,5 +38,11 @@ public class SessionService {
         return userSessionsList.stream()
                 .filter(userSession -> userSession.getUsername().equals(name))
                 .collect(Collectors.toSet());
+    }
+
+    public UserSession getUserSessionById(String userSessionId) {
+        Optional<UserSession> session = userSessionsList.stream()
+                .filter(userSession -> userSession.getSessionId().equals(userSessionId)).findFirst();
+        return session.orElseThrow(() -> new IllegalArgumentException("User session: " + userSessionId + " not Found"));
     }
 }
