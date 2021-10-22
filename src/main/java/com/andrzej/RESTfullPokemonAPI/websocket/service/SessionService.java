@@ -1,5 +1,6 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.service;
 
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

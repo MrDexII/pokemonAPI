@@ -1,5 +1,6 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.config;
 
+import com.andrzej.RESTfullPokemonAPI.websocket.MyHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

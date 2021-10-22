@@ -1,5 +1,10 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.controller;
 
+import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.GameSession;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
+import com.andrzej.RESTfullPokemonAPI.websocket.service.BattleService;
+import com.andrzej.RESTfullPokemonAPI.websocket.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;

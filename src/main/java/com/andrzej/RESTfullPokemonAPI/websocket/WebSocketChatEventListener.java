@@ -1,5 +1,7 @@
 package com.andrzej.RESTfullPokemonAPI.websocket;
 
+import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
+import com.andrzej.RESTfullPokemonAPI.websocket.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;

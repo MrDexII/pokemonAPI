@@ -1,4 +1,7 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.model;
+
+import com.andrzej.RESTfullPokemonAPI.websocket.model.RGBColor;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
 
 import java.util.Set;
 

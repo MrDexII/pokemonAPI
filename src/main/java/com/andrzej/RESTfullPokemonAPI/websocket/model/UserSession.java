@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.model;
 
 import java.util.Random;
 
