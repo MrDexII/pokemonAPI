@@ -1,8 +1,9 @@
 package com.andrzej.RESTfullPokemonAPI.websocket.controller;
 
-import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.GameSession;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChangePokemon;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
 import com.andrzej.RESTfullPokemonAPI.websocket.service.BattleService;
 import com.andrzej.RESTfullPokemonAPI.websocket.service.SessionService;
 import org.slf4j.Logger;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -96,28 +96,29 @@ public class WebSocketChatController {
 
     @GetMapping("/gameSession/{id}")
     public ResponseEntity<GameSession> checkIsGameSessionExists(@PathVariable("id") String id) {
-        boolean isSessionPresent = battleService.isPresent(id);
-        Optional<GameSession> byId = battleService.findById(id);
-        if (isSessionPresent) {
-            return ResponseEntity.ok(byId.get());
-        } else
-            return ResponseEntity.notFound().build();
+        Optional<GameSession> optionalGameSession = battleService.findGameSessionById(id);
+        if (optionalGameSession.isPresent()) {
+            GameSession gameSession = optionalGameSession.get();
+            synchronized (gameSession) {
+                if (gameSession.getUserSessionsList()[0].getPokemonList() == null &&
+                        gameSession.getUserSessionsList()[1].getPokemonList() == null) {
+                    gameSession = battleService.setFreshUserPokemonList(gameSession);
+                }
+            }
+            return ResponseEntity.ok(gameSession);
+        }
+        return ResponseEntity.notFound().build();
     }
-
 
     @MessageMapping("/lobby.{id}")
     public void lobbyInfoExchange(@DestinationVariable String id, @Payload UserSession userSession) {
-        Optional<GameSession> optionalGameSession = battleService.findById(id);
-        GameSession gameSession = optionalGameSession.orElseThrow(() ->
-                new IllegalArgumentException("wrong game session id: " + id));
-        UserSession[] userSessionsList = gameSession.getUserSessionsList();
-        if (Objects.equals(userSessionsList[0].getSessionId(), userSession.getSessionId())) {
-            userSessionsList[0] = userSession;
-        } else {
-            userSessionsList[1] = userSession;
-        }
-        gameSession.setUserSessionsList(userSessionsList);
-        battleService.updateBattleSession(gameSession);
+        battleService.updateBattleSession(id, userSession);
+        messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
+    }
+
+    @MessageMapping("/lobby.update.{id}")
+    public void updateLobby(@DestinationVariable String id, @Payload UserSessionChangePokemon userSessionChangePokemon) {
+        UserSession userSession = battleService.updateBattleSession(id, userSessionChangePokemon);
         messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
     }
 }

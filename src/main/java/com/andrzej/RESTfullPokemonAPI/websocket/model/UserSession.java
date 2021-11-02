@@ -1,5 +1,8 @@
 package com.andrzej.RESTfullPokemonAPI.websocket.model;
 
+import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
+
+import java.util.Arrays;
 import java.util.Random;
 
 public class UserSession {
@@ -8,6 +11,7 @@ public class UserSession {
     private String username;
     private RGBColor color;
     private Boolean ready;
+    private Pokemon[] pokemonList;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
@@ -54,6 +58,14 @@ public class UserSession {
         this.ready = ready;
     }
 
+    public Pokemon[] getPokemonList() {
+        return pokemonList;
+    }
+
+    public void setPokemonList(Pokemon[] pokemonList) {
+        this.pokemonList = pokemonList;
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +
@@ -61,6 +73,7 @@ public class UserSession {
                 ", username='" + username + '\'' +
                 ", color=" + color +
                 ", ready=" + ready +
+                ", pokemonList=" + Arrays.toString(pokemonList) +
                 '}';
     }
 }
