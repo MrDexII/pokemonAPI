@@ -21,8 +21,8 @@ public class BattleService {
     public BattleService(SessionService sessionService, PokemonService pokemonService) {
         this.sessionService = sessionService;
         this.pokemonService = pokemonService;
-        this.pokemonCount = pokemonService.getPokemonCount();
-//        this.pokemonCount = 151;
+//        this.pokemonCount = pokemonService.getPokemonCount();
+        this.pokemonCount = 151;
         this.gameSessions = new HashSet<>();
     }
 
@@ -90,13 +90,16 @@ public class BattleService {
             pokemonList = userSessionsList[1].getPokemonList();
             userIndex = 1;
         }
-        Set<Integer> pokemonNumbersSet = Arrays.stream(pokemonList).map(Pokemon::getNumber).collect(Collectors.toSet());
-        int newPokemonNumber = drawOneNumber(pokemonNumbersSet);
-        pokemonNumbersSet.remove(userSessionChangePokemon.pokemonNumberToChange());
-        pokemonNumbersSet.add(newPokemonNumber);
-        Pokemon[] pokemonArray = mapNumbersToPokemonArray(pokemonNumbersSet);
-
-        userSessionsList[userIndex].setPokemonList(pokemonArray);
+        int reRollCount = userSessionsList[userIndex].getReRollCount();
+        if (reRollCount > 0) {
+            userSessionsList[userIndex].decrementReRollCount();
+            Set<Integer> pokemonNumbersSet = Arrays.stream(pokemonList).map(Pokemon::getNumber).collect(Collectors.toSet());
+            int newPokemonNumber = drawOneNumber(pokemonNumbersSet);
+            pokemonNumbersSet.remove(userSessionChangePokemon.pokemonNumberToChange());
+            pokemonNumbersSet.add(newPokemonNumber);
+            Pokemon[] pokemonArray = mapNumbersToPokemonArray(pokemonNumbersSet);
+            userSessionsList[userIndex].setPokemonList(pokemonArray);
+        }
         newGameSession.setUserSessionsList(userSessionsList);
         this.updateBattleSession(newGameSession);
 

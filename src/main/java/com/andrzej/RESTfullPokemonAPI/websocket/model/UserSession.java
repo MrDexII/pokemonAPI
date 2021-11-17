@@ -12,11 +12,13 @@ public class UserSession {
     private RGBColor color;
     private Boolean ready;
     private Pokemon[] pokemonList;
+    private int reRollCount;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
         this.color = setColor();
+        this.reRollCount = 3;
     }
 
     private RGBColor setColor() {
@@ -66,6 +68,14 @@ public class UserSession {
         this.pokemonList = pokemonList;
     }
 
+    public int getReRollCount() {
+        return reRollCount;
+    }
+
+    public void decrementReRollCount() {
+        this.reRollCount = this.reRollCount - 1;
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +
@@ -74,6 +84,7 @@ public class UserSession {
                 ", color=" + color +
                 ", ready=" + ready +
                 ", pokemonList=" + Arrays.toString(pokemonList) +
+                ", reRollCount=" + reRollCount +
                 '}';
     }
 }

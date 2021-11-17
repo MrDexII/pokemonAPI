@@ -116,8 +116,8 @@ public class WebSocketChatController {
         messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
     }
 
-    @MessageMapping("/lobby.update.{id}")
-    public void updateLobby(@DestinationVariable String id, @Payload UserSessionChangePokemon userSessionChangePokemon) {
+    @MessageMapping("/lobby.changePokemon.{id}")
+    public void updateLobbyWithNewPokemon(@DestinationVariable String id, @Payload UserSessionChangePokemon userSessionChangePokemon) {
         UserSession userSession = battleService.updateBattleSession(id, userSessionChangePokemon);
         messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
     }
