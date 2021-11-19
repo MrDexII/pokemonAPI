@@ -4,21 +4,26 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.GameSession;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
-import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChangePokemon;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChosePokemon;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 public class BattleService {
     private final Set<GameSession> gameSessions;
-    private final SessionService sessionService;
+    private final UserSessionService sessionService;
     private final PokemonService pokemonService;
     private final Integer pokemonCount;
 
-    public BattleService(SessionService sessionService, PokemonService pokemonService) {
+    private final Logger logger = LoggerFactory.getLogger(BattleService.class);
+
+    public BattleService(UserSessionService sessionService, PokemonService pokemonService) {
         this.sessionService = sessionService;
         this.pokemonService = pokemonService;
 //        this.pokemonCount = pokemonService.getPokemonCount();
@@ -45,9 +50,7 @@ public class BattleService {
     }
 
     public void updateBattleSession(String sessionId, UserSession userSession) {
-        Optional<GameSession> optionalGameSession = findGameSessionById(sessionId);
-        GameSession gameSession = optionalGameSession.orElseThrow(() ->
-                new IllegalArgumentException("wrong game session id: " + sessionId));
+        GameSession gameSession = checkIfGameSessionExists(sessionId);
         UserSession[] userSessionsList = gameSession.getUserSessionsList();
         if (userSessionsList[0].getSessionId().equals(userSession.getSessionId())) {
             userSessionsList[0] = userSession;
@@ -55,35 +58,21 @@ public class BattleService {
             userSessionsList[1] = userSession;
         }
         gameSession.setUserSessionsList(userSessionsList);
-
-        Optional<GameSession> oldSession = this.gameSessions.stream()
-                .filter(session -> session.getId().equals(gameSession.getId()))
-                .findFirst();
-        oldSession.ifPresent(this.gameSessions::remove);
-        this.gameSessions.add(gameSession);
+        updateBattleSession(gameSession);
     }
 
-    public void updateBattleSession(GameSession gameSession) {
-        Optional<GameSession> oldGameSession = this.gameSessions.stream()
-                .filter(gameSession1 -> gameSession1.getId().equals(gameSession.getId()))
-                .findFirst();
-        oldGameSession.ifPresent(this.gameSessions::remove);
-        this.gameSessions.add(gameSession);
+    public void updateBattleSession(GameSession newGameSession) {
+        GameSession oldGameSession = checkIfGameSessionExists(newGameSession.getId());
+        this.gameSessions.remove(oldGameSession);
+        this.gameSessions.add(newGameSession);
     }
 
-    public UserSession updateBattleSession(String id, UserSessionChangePokemon userSessionChangePokemon) {
-        Optional<GameSession> oldSession = this.gameSessions.stream()
-                .filter(session -> session.getId().equals(id))
-                .findFirst();
-        oldSession.ifPresentOrElse(this.gameSessions::remove,
-                () -> {
-                    throw new IllegalArgumentException("Wrong session id " + id);
-                });
-        GameSession newGameSession = oldSession.get();
-        UserSession[] userSessionsList = oldSession.get().getUserSessionsList();
+    public UserSession reRollPokemon(String sessionId, UserSessionChosePokemon userSessionChangePokemon) {
+        GameSession gameSession = checkIfGameSessionExists(sessionId);
+        UserSession[] userSessionsList = gameSession.getUserSessionsList();
         Pokemon[] pokemonList;
         int userIndex;
-        if (userSessionsList[0].getSessionId().equals(userSessionChangePokemon.sessionId())) {
+        if (userSessionsList[0].getSessionId().equals(userSessionChangePokemon.userSessionId())) {
             pokemonList = userSessionsList[0].getPokemonList();
             userIndex = 0;
         } else {
@@ -95,15 +84,52 @@ public class BattleService {
             userSessionsList[userIndex].decrementReRollCount();
             Set<Integer> pokemonNumbersSet = Arrays.stream(pokemonList).map(Pokemon::getNumber).collect(Collectors.toSet());
             int newPokemonNumber = drawOneNumber(pokemonNumbersSet);
-            pokemonNumbersSet.remove(userSessionChangePokemon.pokemonNumberToChange());
+            pokemonNumbersSet.remove(userSessionChangePokemon.pokemonNumber());
             pokemonNumbersSet.add(newPokemonNumber);
             Pokemon[] pokemonArray = mapNumbersToPokemonArray(pokemonNumbersSet);
             userSessionsList[userIndex].setPokemonList(pokemonArray);
         }
-        newGameSession.setUserSessionsList(userSessionsList);
-        this.updateBattleSession(newGameSession);
+        gameSession.setUserSessionsList(userSessionsList);
+        this.updateBattleSession(gameSession);
 
         return userSessionsList[userIndex];
+    }
+
+    public GameSession setFreshUserPokemonList(GameSession gameSession) {
+        UserSession[] userSessions = Arrays.stream(gameSession.getUserSessionsList())
+                .map(this::setFreshUserPokemonList)
+                .toArray(UserSession[]::new);
+        gameSession.setUserSessionsList(userSessions);
+        this.updateBattleSession(gameSession);
+        return gameSession;
+    }
+
+    public GameSession chosePokemonToDuel(String sessionId, UserSessionChosePokemon userSessionChosePokemon) {
+        GameSession gameSession = checkIfGameSessionExists(sessionId);
+        UserSession[] userSessionsList = gameSession.getUserSessionsList();
+        if (userSessionsList[0].getSessionId().equals(userSessionChosePokemon.userSessionId())) {
+            userSessionsList[0].setChosenPokemon(mapNumberToPokemon(userSessionChosePokemon.pokemonNumber()));
+        } else {
+            userSessionsList[1].setChosenPokemon(mapNumberToPokemon(userSessionChosePokemon.pokemonNumber()));
+        }
+        gameSession.setUserSessionsList(userSessionsList);
+        this.updateBattleSession(gameSession);
+        return gameSession;
+    }
+
+    public GameSession battle(GameSession gameSession) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(2);
+        gameSession.getUserSessionsList()[0].setChosenPokemon(null);
+        gameSession.getUserSessionsList()[1].setChosenPokemon(null);
+        updateBattleSession(gameSession);
+        return gameSession;
+    }
+
+    private GameSession checkIfGameSessionExists(String sessionId) {
+        Optional<GameSession> oldSession = findGameSessionById(sessionId);
+        return oldSession.orElseThrow(() -> {
+            throw new IllegalArgumentException("Wrong session id " + sessionId);
+        });
     }
 
     private UserSession setFreshUserPokemonList(UserSession userSession) {
@@ -116,16 +142,6 @@ public class BattleService {
         return userSession;
     }
 
-
-    public GameSession setFreshUserPokemonList(GameSession gameSession) {
-        UserSession[] userSessions = Arrays.stream(gameSession.getUserSessionsList())
-                .map(this::setFreshUserPokemonList)
-                .toArray(UserSession[]::new);
-        gameSession.setUserSessionsList(userSessions);
-        this.updateBattleSession(gameSession);
-        return gameSession;
-    }
-
     private int drawOneNumber(Set<Integer> numbersCantRoll) {
         Random random = new Random();
         while (true) {
@@ -136,9 +152,13 @@ public class BattleService {
         }
     }
 
+    private Pokemon mapNumberToPokemon(int pokemonNumber) {
+        return pokemonService.getPokemonByNumber(pokemonNumber);
+    }
+
     private Pokemon[] mapNumbersToPokemonArray(Set<Integer> pokemonNumbers) {
         return pokemonNumbers.stream()
-                .map(pokemonService::getPokemonByNumber)
+                .map(this::mapNumberToPokemon)
                 .toArray(Pokemon[]::new);
     }
 }

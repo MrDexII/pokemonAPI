@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class SessionService {
+public class UserSessionService {
 
     private final Set<UserSession> userSessionsList;
 
-    public SessionService() {
+    public UserSessionService() {
         userSessionsList = new HashSet<>();
     }
 
@@ -26,9 +26,7 @@ public class SessionService {
     }
 
     public void deleteUserByUserName(String name) {
-        Set<UserSession> repeatedSessionUsers = findUser(name);
-        if (!repeatedSessionUsers.isEmpty())
-            userSessionsList.removeAll(repeatedSessionUsers);
+        userSessionsList.removeIf(userSession -> userSession.getUsername().equals(name));
     }
 
     public Set<UserSession> getUserSessionsList() {

@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.config;
 
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtAuthenticationUtils;
 import org.springframework.beans.factory.annotation.Autowired;

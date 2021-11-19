@@ -1,7 +1,7 @@
-package com.andrzej.RESTfullPokemonAPI.websocket;
+package com.andrzej.RESTfullPokemonAPI.websocket.config;
 
 import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
-import com.andrzej.RESTfullPokemonAPI.websocket.service.SessionService;
+import com.andrzej.RESTfullPokemonAPI.websocket.service.UserSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -17,10 +17,10 @@ import java.security.Principal;
 public class WebSocketChatEventListener {
 
     private final SimpMessageSendingOperations messageTemplate;
-    private final SessionService sessionService;
+    private final UserSessionService sessionService;
     private final Logger logger = LoggerFactory.getLogger(WebSocketChatEventListener.class);
 
-    public WebSocketChatEventListener(SimpMessageSendingOperations messageTemplate, SessionService sessionService) {
+    public WebSocketChatEventListener(SimpMessageSendingOperations messageTemplate, UserSessionService sessionService) {
         this.messageTemplate = messageTemplate;
         this.sessionService = sessionService;
     }

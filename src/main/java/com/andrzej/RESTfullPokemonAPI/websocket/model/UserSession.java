@@ -3,6 +3,7 @@ package com.andrzej.RESTfullPokemonAPI.websocket.model;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public class UserSession {
@@ -13,6 +14,7 @@ public class UserSession {
     private Boolean ready;
     private Pokemon[] pokemonList;
     private int reRollCount;
+    private Pokemon chosenPokemon;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
@@ -76,6 +78,14 @@ public class UserSession {
         this.reRollCount = this.reRollCount - 1;
     }
 
+    public Pokemon getChosenPokemon() {
+        return chosenPokemon;
+    }
+
+    public void setChosenPokemon(Pokemon chosenPokemon) {
+        this.chosenPokemon = chosenPokemon;
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +
@@ -85,6 +95,22 @@ public class UserSession {
                 ", ready=" + ready +
                 ", pokemonList=" + Arrays.toString(pokemonList) +
                 ", reRollCount=" + reRollCount +
+                ", chosenPokemon=" + chosenPokemon +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserSession that = (UserSession) o;
+        return reRollCount == that.reRollCount && Objects.equals(sessionId, that.sessionId) && Objects.equals(username, that.username) && Objects.equals(color, that.color) && Objects.equals(ready, that.ready) && Arrays.equals(pokemonList, that.pokemonList) && Objects.equals(chosenPokemon, that.chosenPokemon);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(sessionId, username, color, ready, reRollCount, chosenPokemon);
+        result = 31 * result + Arrays.hashCode(pokemonList);
+        return result;
     }
 }

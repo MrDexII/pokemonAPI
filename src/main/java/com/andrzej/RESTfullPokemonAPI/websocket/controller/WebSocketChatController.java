@@ -2,10 +2,10 @@ package com.andrzej.RESTfullPokemonAPI.websocket.controller;
 
 import com.andrzej.RESTfullPokemonAPI.websocket.model.GameSession;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
-import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChangePokemon;
+import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChosePokemon;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.WebSocketChatMessage;
 import com.andrzej.RESTfullPokemonAPI.websocket.service.BattleService;
-import com.andrzej.RESTfullPokemonAPI.websocket.service.SessionService;
+import com.andrzej.RESTfullPokemonAPI.websocket.service.UserSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +25,13 @@ import java.util.Set;
 
 @Controller
 public class WebSocketChatController {
-    private final SessionService sessionService;
+    private final UserSessionService sessionService;
     private final SimpMessageSendingOperations messageSendingTemplate;
     private final BattleService battleService;
 
     private final Logger logger = LoggerFactory.getLogger(WebSocketChatController.class);
 
-    public WebSocketChatController(SessionService sessionService,
+    public WebSocketChatController(UserSessionService sessionService,
                                    SimpMessageSendingOperations messageSendingTemplate,
                                    BattleService battleService) {
         this.sessionService = sessionService;
@@ -110,15 +110,33 @@ public class WebSocketChatController {
         return ResponseEntity.notFound().build();
     }
 
-    @MessageMapping("/lobby.{id}")
-    public void lobbyInfoExchange(@DestinationVariable String id, @Payload UserSession userSession) {
-        battleService.updateBattleSession(id, userSession);
-        messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
+    @MessageMapping("/lobby.{lobbyId}")
+    public void lobbyInfoExchange(@DestinationVariable String lobbyId, @Payload UserSession userSession) {
+        battleService.updateBattleSession(lobbyId, userSession);
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, userSession);
     }
 
-    @MessageMapping("/lobby.changePokemon.{id}")
-    public void updateLobbyWithNewPokemon(@DestinationVariable String id, @Payload UserSessionChangePokemon userSessionChangePokemon) {
-        UserSession userSession = battleService.updateBattleSession(id, userSessionChangePokemon);
-        messageSendingTemplate.convertAndSend("/topic/lobby." + id, userSession);
+    @MessageMapping("/lobby.changePokemon.{lobbyId}")
+    public void updateLobbyWithNewPokemon(@DestinationVariable String lobbyId, @Payload UserSessionChosePokemon userSessionChangePokemon) {
+        UserSession userSession = battleService.reRollPokemon(lobbyId, userSessionChangePokemon);
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, userSession);
+    }
+
+    @MessageMapping("/lobby.duel.{lobbyId}")
+    public void chosePokemonToDuel(@DestinationVariable String lobbyId, @Payload UserSessionChosePokemon userSessionChosePokemon) throws InterruptedException {
+        GameSession gameSession = new GameSession();
+        synchronized (gameSession) {
+            gameSession = battleService.chosePokemonToDuel(lobbyId, userSessionChosePokemon);
+            if (gameSession.getUserSessionsList()[0].getChosenPokemon() == null ||
+                    gameSession.getUserSessionsList()[1].getChosenPokemon() == null
+            ) return;
+        }
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[0]);
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[1]);
+
+        GameSession battle = battleService.battle(gameSession);
+
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[0]);
+        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[1]);
     }
 }
