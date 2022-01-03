@@ -43,5 +43,6 @@ public class WebSocketChatEventListener {
             chatMessage.setUserSessionsList(sessionService.getUserSessionsList());
             messageTemplate.convertAndSend("/topic/gameChat", chatMessage);
         }
+        logger.info("Session disconnect "+ event.toString());
     }
 }

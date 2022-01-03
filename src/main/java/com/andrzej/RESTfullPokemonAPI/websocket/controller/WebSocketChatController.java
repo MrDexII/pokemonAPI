@@ -134,6 +134,7 @@ public class WebSocketChatController {
         messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[0]);
         messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[1]);
 
+        //return the result of battle
         GameSession battle = battleService.battle(gameSession);
 
         messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[0]);

@@ -1,9 +1,6 @@
 package com.andrzej.RESTfullPokemonAPI.websocket.model;
 
-import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
-
 public class GameSession {
-
     private String id;
     private UserSession[] userSessionsList;
 
