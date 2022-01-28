@@ -130,14 +130,15 @@ public class WebSocketChatController {
             if (gameSession.getUserSessionsList()[0].getChosenPokemon() == null ||
                     gameSession.getUserSessionsList()[1].getChosenPokemon() == null
             ) return;
+
+            messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[0]);
+            messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[1]);
+
+            //return the result of battle
+            GameSession battle = battleService.battle(gameSession);
+
+            messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[0]);
+            messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[1]);
         }
-        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[0]);
-        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, gameSession.getUserSessionsList()[1]);
-
-        //return the result of battle
-        GameSession battle = battleService.battle(gameSession);
-
-        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[0]);
-        messageSendingTemplate.convertAndSend("/topic/lobby." + lobbyId, battle.getUserSessionsList()[1]);
     }
 }

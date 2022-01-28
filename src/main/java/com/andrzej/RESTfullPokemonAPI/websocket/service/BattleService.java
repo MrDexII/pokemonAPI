@@ -5,6 +5,7 @@ import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.GameSession;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSession;
 import com.andrzej.RESTfullPokemonAPI.websocket.model.UserSessionChosePokemon;
+import com.andrzej.RESTfullPokemonAPI.websocket.utils.PokemonUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,8 +120,51 @@ public class BattleService {
 
     public GameSession battle(GameSession gameSession) throws InterruptedException {
         TimeUnit.SECONDS.sleep(2);
+        int winningPokemonIndex = PokemonUtils.returnWinningPokemonIndex(
+                gameSession.getUserSessionsList()[0].getChosenPokemon(),
+                gameSession.getUserSessionsList()[1].getChosenPokemon());
+
+        if (winningPokemonIndex == -1) {
+            gameSession.getUserSessionsList()[0].removePokemonFromList(
+                    gameSession.getUserSessionsList()[0].getChosenPokemon().get_id());
+            gameSession.getUserSessionsList()[1].removePokemonFromList(
+                    gameSession.getUserSessionsList()[1].getChosenPokemon().get_id());
+
+            gameSession.getUserSessionsList()[1].setMessage("Draw");
+            gameSession.getUserSessionsList()[0].setMessage("Draw");
+        } else if (winningPokemonIndex == 0) {
+            gameSession.getUserSessionsList()[1].removePokemonFromList(
+                    gameSession.getUserSessionsList()[1].getChosenPokemon().get_id());
+
+            gameSession.getUserSessionsList()[0].setMessage(
+                    "Pokemon " + gameSession.getUserSessionsList()[winningPokemonIndex].getChosenPokemon().getName() + " won");
+            gameSession.getUserSessionsList()[1].setMessage(
+                    "Pokemon " + gameSession.getUserSessionsList()[winningPokemonIndex].getChosenPokemon().getName() + " won");
+        } else {
+            gameSession.getUserSessionsList()[0].removePokemonFromList(
+                    gameSession.getUserSessionsList()[0].getChosenPokemon().get_id());
+
+            gameSession.getUserSessionsList()[0].setMessage(
+                    "Pokemon " + gameSession.getUserSessionsList()[winningPokemonIndex].getChosenPokemon().getName() + " won");
+            gameSession.getUserSessionsList()[1].setMessage(
+                    "Pokemon " + gameSession.getUserSessionsList()[winningPokemonIndex].getChosenPokemon().getName() + " won");
+        }
+
         gameSession.getUserSessionsList()[0].setChosenPokemon(null);
         gameSession.getUserSessionsList()[1].setChosenPokemon(null);
+
+        if (gameSession.getUserSessionsList()[0].getPokemonList().length == 0 &&
+                gameSession.getUserSessionsList()[1].getPokemonList().length == 0) {
+            gameSession.getUserSessionsList()[0].setMessage("Draw");
+            gameSession.getUserSessionsList()[1].setMessage("Draw");
+        } else if (gameSession.getUserSessionsList()[0].getPokemonList().length == 0) {
+            gameSession.getUserSessionsList()[0].setMessage("You lost");
+            gameSession.getUserSessionsList()[1].setMessage("You won");
+        } else if (gameSession.getUserSessionsList()[1].getPokemonList().length == 0){
+            gameSession.getUserSessionsList()[0].setMessage("You won");
+            gameSession.getUserSessionsList()[1].setMessage("You lost");
+        }
+
         updateBattleSession(gameSession);
         return gameSession;
     }
