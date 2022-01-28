@@ -15,6 +15,7 @@ public class UserSession {
     private Pokemon[] pokemonList;
     private int reRollCount;
     private Pokemon chosenPokemon;
+    private String message;
 
     public UserSession(String sessionId, String username) {
         this.sessionId = sessionId;
@@ -86,6 +87,21 @@ public class UserSession {
         this.chosenPokemon = chosenPokemon;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void removePokemonFromList(String id) {
+        Pokemon[] pokemons = Arrays.stream(this.pokemonList)
+                .filter(pokemon -> !pokemon.get_id().equals(id))
+                .toArray(Pokemon[]::new);
+        this.setPokemonList(pokemons);
+    }
+
     @Override
     public String toString() {
         return "UserSession{" +
@@ -96,6 +112,7 @@ public class UserSession {
                 ", pokemonList=" + Arrays.toString(pokemonList) +
                 ", reRollCount=" + reRollCount +
                 ", chosenPokemon=" + chosenPokemon +
+                ", message='" + message + '\'' +
                 '}';
     }
 
@@ -104,12 +121,12 @@ public class UserSession {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserSession that = (UserSession) o;
-        return reRollCount == that.reRollCount && Objects.equals(sessionId, that.sessionId) && Objects.equals(username, that.username) && Objects.equals(color, that.color) && Objects.equals(ready, that.ready) && Arrays.equals(pokemonList, that.pokemonList) && Objects.equals(chosenPokemon, that.chosenPokemon);
+        return reRollCount == that.reRollCount && Objects.equals(sessionId, that.sessionId) && Objects.equals(username, that.username) && Objects.equals(color, that.color) && Objects.equals(ready, that.ready) && Arrays.equals(pokemonList, that.pokemonList) && Objects.equals(chosenPokemon, that.chosenPokemon) && Objects.equals(message, that.message);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sessionId, username, color, ready, reRollCount, chosenPokemon);
+        int result = Objects.hash(sessionId, username, color, ready, reRollCount, chosenPokemon, message);
         result = 31 * result + Arrays.hashCode(pokemonList);
         return result;
     }
