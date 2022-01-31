@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo:4.2.3-bionic
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: pokemon_db
+    ports:
+      - 27017:27017
