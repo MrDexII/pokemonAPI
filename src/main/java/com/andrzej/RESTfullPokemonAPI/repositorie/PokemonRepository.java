@@ -9,5 +9,9 @@ import java.util.Optional;
 public interface PokemonRepository extends DAORepository<Pokemon, String> {
     Optional<Pokemon> findByName(String name);
 
+    Optional<Pokemon> findByNumber(Integer number);
+
     Page<Pokemon> findAll(Pageable page);
+
+    Long countPokemon();
 }

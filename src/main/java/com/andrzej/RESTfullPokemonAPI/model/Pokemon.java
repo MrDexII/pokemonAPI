@@ -17,6 +17,7 @@ public class Pokemon {
     private String fotoUrl;
     private List<String> types;
     private PokemonStats pokemonStats;
+    private boolean isPokemonDead;
 
     public Pokemon() {
     }
@@ -27,6 +28,7 @@ public class Pokemon {
         this.fotoUrl = fotoUrl;
         this.types = types;
         this.pokemonStats = pokemonStats;
+        this.isPokemonDead = false;
     }
 
     @PersistenceConstructor
@@ -87,6 +89,14 @@ public class Pokemon {
         this.pokemonStats = pokemonStats;
     }
 
+    public boolean isPokemonDead() {
+        return isPokemonDead;
+    }
+
+    public void setPokemonDead(boolean pokemonDead) {
+        isPokemonDead = pokemonDead;
+    }
+
     @Override
     public String toString() {
         return "Pokemon{" +
@@ -96,6 +106,7 @@ public class Pokemon {
                 ", fotoUrl='" + fotoUrl + '\'' +
                 ", types=" + types +
                 ", pokemonStats=" + pokemonStats +
+                ", isPokemonDead=" + isPokemonDead +
                 '}';
     }
 
@@ -104,11 +115,11 @@ public class Pokemon {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pokemon pokemon = (Pokemon) o;
-        return Objects.equals(_id, pokemon._id) && Objects.equals(number, pokemon.number) && Objects.equals(name, pokemon.name) && Objects.equals(fotoUrl, pokemon.fotoUrl) && Objects.equals(types, pokemon.types) && Objects.equals(pokemonStats, pokemon.pokemonStats);
+        return isPokemonDead == pokemon.isPokemonDead && Objects.equals(_id, pokemon._id) && Objects.equals(number, pokemon.number) && Objects.equals(name, pokemon.name) && Objects.equals(fotoUrl, pokemon.fotoUrl) && Objects.equals(types, pokemon.types) && Objects.equals(pokemonStats, pokemon.pokemonStats);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_id, number, name, fotoUrl, types, pokemonStats);
+        return Objects.hash(_id, number, name, fotoUrl, types, pokemonStats, isPokemonDead);
     }
 }

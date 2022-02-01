@@ -87,4 +87,13 @@ public class PokemonService {
         pokemonRepository.delete(pokemon.get());
         return ResponseEntity.noContent().build();
     }
+
+    public Integer getPokemonCount() {
+        return Math.toIntExact(pokemonRepository.countPokemon());
+    }
+
+    public Pokemon getPokemonByNumber(Integer number) {
+        Optional<Pokemon> pokemonByNumber = pokemonRepository.findByNumber(number);
+        return pokemonByNumber.orElseGet(Pokemon::new);
+    }
 }

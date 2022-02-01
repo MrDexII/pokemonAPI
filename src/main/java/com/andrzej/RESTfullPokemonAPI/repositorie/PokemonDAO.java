@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
+import  org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -31,6 +31,13 @@ public class PokemonDAO implements PokemonRepository {
     }
 
     @Override
+    public Optional<Pokemon> findByNumber(Integer number) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("number").is(number));
+        return Optional.ofNullable(mongoTemplate.findOne(query, Pokemon.class));
+    }
+
+    @Override
     public Page<Pokemon> findAll(Pageable pageable) {
         Query query = new Query().with(pageable);
         List<Pokemon> pokemons = mongoTemplate.find(query, Pokemon.class);
@@ -38,6 +45,12 @@ public class PokemonDAO implements PokemonRepository {
                 pokemons,
                 pageable,
                 () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), Pokemon.class));
+    }
+
+    @Override
+    public Long countPokemon() {
+        Query query = new Query();
+        return mongoTemplate.count(query,Pokemon.class);
     }
 
     @Override

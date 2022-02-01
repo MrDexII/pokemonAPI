@@ -26,7 +26,7 @@ public class PokemonModelAssembler implements RepresentationModelAssembler<Pokem
 //                linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.getId())).withSelfRel(),
 //                linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.getId())).withRel("delete")
 //        );
-        return new EntityModel<>(pokemon,
+        return EntityModel.of(pokemon,
                 linkTo(methodOn(PokemonController.class).getPokemonById(pokemon.get_id())).withSelfRel(),
                 linkTo(methodOn(PokemonController.class).deletePokemon(pokemon.get_id())).withRel("delete"));
     }
