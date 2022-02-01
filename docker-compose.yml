@@ -8,6 +8,26 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: pokemon_db
+      MONGO_INITDB_DATABASE: admin
     ports:
       - 27017:27017
+    volumes:
+      - "./docker-entrypoint/mongo_init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro"
+
+  mysql:
+    image: mysql:8.0.27
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: users
+    ports:
+      - 3306:3306
+
+  rabbitmq:
+    image: rabbitmq:3.9.12-management-alpine
+    restart: always
+    ports:
+      - 15672:15672
+      - 61613:61613
+    volumes:
+      - "./docker-entrypoint/rabbit_enabled_plugins.env:/etc/rabbitmq/enabled_plugins"
