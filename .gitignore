@@ -5,6 +5,7 @@ target/
 !**/src/test/**
 src/main/resources/application.properties
 docker-entrypoint/mongors
+docker-entrypoint/monstache/logs
 
 ### STS ###
 .apt_generated
