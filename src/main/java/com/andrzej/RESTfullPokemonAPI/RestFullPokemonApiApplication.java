@@ -1,8 +1,11 @@
 package com.andrzej.RESTfullPokemonAPI;
 
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+@EnableMongoRepositories(basePackageClasses = PokemonRepository.class)
 @SpringBootApplication
 public class RestFullPokemonApiApplication {
 

@@ -3,12 +3,13 @@ package com.andrzej.RESTfullPokemonAPI.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 import java.util.Objects;
 
-@Document("pokemon")
+@Document(indexName = "pokemon_db.pokemon")
 public class Pokemon {
     @Id
     private ObjectId _id;
@@ -17,6 +18,7 @@ public class Pokemon {
     private String fotoUrl;
     private List<String> types;
     private PokemonStats pokemonStats;
+    @Transient
     private boolean isPokemonDead;
 
     public Pokemon() {
