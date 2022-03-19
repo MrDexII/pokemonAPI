@@ -4,10 +4,11 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import  org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,7 +40,9 @@ public class PokemonDAO implements PokemonRepository {
 
     @Override
     public Page<Pokemon> findAll(Pageable pageable) {
-        Query query = new Query().with(pageable);
+        Query query = new Query()
+                .with(pageable)
+                .with(Sort.by(Sort.Direction.ASC, "number"));
         List<Pokemon> pokemons = mongoTemplate.find(query, Pokemon.class);
         return PageableExecutionUtils.getPage(
                 pokemons,
@@ -50,7 +53,7 @@ public class PokemonDAO implements PokemonRepository {
     @Override
     public Long countPokemon() {
         Query query = new Query();
-        return mongoTemplate.count(query,Pokemon.class);
+        return mongoTemplate.count(query, Pokemon.class);
     }
 
     @Override
