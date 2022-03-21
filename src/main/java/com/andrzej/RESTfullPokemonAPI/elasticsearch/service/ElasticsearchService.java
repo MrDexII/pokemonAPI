@@ -27,6 +27,9 @@ public class ElasticsearchService {
 
     public ResponseEntity<PagedModel<EntityModel<Pokemon>>> searchAsYouType(String pokemonName, Pageable pageable) {
         Page<Pokemon> pokemons = myElasticsearchRepository.searchAsYouType(pokemonName, pageable);
+        if (pokemons.getContent().size() == 0) {
+            return ResponseEntity.noContent().build();
+        }
         PagedModel<EntityModel<Pokemon>> entityModels = pagedResourcesAssembler.toModel(pokemons, pokemonModelAssembler);
         return ResponseEntity.ok(entityModels);
     }
