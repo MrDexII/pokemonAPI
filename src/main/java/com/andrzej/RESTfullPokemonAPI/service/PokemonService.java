@@ -89,7 +89,7 @@ public class PokemonService {
     }
 
     public Integer getPokemonCount() {
-        return Math.toIntExact(pokemonRepository.countPokemon());
+        return Math.toIntExact(pokemonRepository.count());
     }
 
     public Pokemon getPokemonByNumber(Integer number) {

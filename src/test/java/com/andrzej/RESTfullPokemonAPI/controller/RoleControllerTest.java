@@ -3,6 +3,7 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import com.andrzej.RESTfullPokemonAPI.service.RoleService;
@@ -58,6 +59,9 @@ class RoleControllerTest {
 
     @MockBean
     private JwtConfig jwtConfig;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
 
     @Test
     public void shouldReturnStatusOkAndListOfRoles() throws Exception {

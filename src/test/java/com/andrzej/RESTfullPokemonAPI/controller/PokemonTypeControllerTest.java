@@ -4,6 +4,7 @@ import com.andrzej.RESTfullPokemonAPI.assembler.PokemonTypeModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
@@ -72,6 +73,9 @@ class PokemonTypeControllerTest {
 
     @MockBean
     private JwtConfig jwtConfig;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
 
     @Test
     void ShouldReturnStatus201AndReturnSavedPokemonCreatePokemonType() throws Exception {
