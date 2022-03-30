@@ -2,8 +2,10 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonTypeModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonTypeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,6 +65,12 @@ class PokemonTypeControllerTest {
 
     @MockBean
     private JwtConfig jwtConfig;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     @Test
     void ShouldReturnStatus201AndReturnSavedPokemonCreatePokemonType() throws Exception {

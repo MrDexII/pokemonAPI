@@ -2,11 +2,13 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.model.Stats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
@@ -17,10 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
@@ -73,6 +72,12 @@ class PokemonControllerTest {
 
     @SpyBean
     PagedResourcesAssembler<Pokemon> pagedResourcesAssembler;
+
+    @MockBean
+    private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private MyElasticsearchRepository elasticsearchRepository;
 
     @Test
     void ShouldReturnStatus201AndCreatePokemon() throws Exception {
@@ -195,7 +200,9 @@ class PokemonControllerTest {
         String expectedCharizardLink = "http://localhost/pokemon/" + pokemon.get_id();
         String expectedBlastoiseLink = "http://localhost/pokemon/" + pokemon2.get_id();
 
-        Pageable pageable = PageRequest.of(0, 2);
+        Sort sort = Sort.by("number").ascending();
+
+        Pageable pageable = PageRequest.of(0, 2, sort);
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
         Page<Pokemon> pages = new PageImpl<>(
@@ -229,7 +236,7 @@ class PokemonControllerTest {
                 .andExpect(jsonPath("$._links.self.href",
                         is("http://localhost/pokemon/?page=" +
                                 pageable.getPageNumber() + "&size=" +
-                                pageable.getPageSize() + "")))
+                                pageable.getPageSize() + "&sort=number,asc")))
                 .andExpect(jsonPath("$.page.size", is(pageable.getPageSize())))
                 .andExpect(jsonPath("$.page.totalElements", is(pokemons.size())))
                 .andExpect(jsonPath("$.page.totalPages", is(pokemons.size() / pageable.getPageSize())))
@@ -240,14 +247,18 @@ class PokemonControllerTest {
     void ShouldReturnStatus200AndReturnEmptyListGetAllPokemons() throws Exception {
         List<Pokemon> pokemons = new ArrayList<>();
 
-        Pageable pageable = PageRequest.of(0, 2);
+        Sort sort = Sort.by("number").ascending();
+
+        Pageable pageable = PageRequest.of(0, 2, sort);
         Page<Pokemon> pages = new PageImpl<>(pokemons, pageable, pokemons.size());
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
                         get("/pokemon/")
                                 .param("page", "0")
-                                .param("size", "2"))
+                                .param("size", "2")
+                                .param("sort", "number"))
+
                 .andExpect(status().isNoContent());
     }
 

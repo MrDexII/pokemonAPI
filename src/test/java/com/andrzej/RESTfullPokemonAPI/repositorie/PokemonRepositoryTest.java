@@ -1,5 +1,6 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.model.Stats;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -25,6 +27,9 @@ class PokemonRepositoryTest {
 
     @Autowired
     private PokemonRepository pokemonRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     private static List<Pokemon> pokemons;
 

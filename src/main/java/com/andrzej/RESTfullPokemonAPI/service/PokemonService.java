@@ -5,7 +5,9 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -45,7 +47,9 @@ public class PokemonService {
     }
 
     public ResponseEntity<?> getAllPokemons(Pageable pageable) {
-        Page<Pokemon> pokemons = pokemonRepository.findAll(pageable);
+        Sort sort = Sort.by("number").ascending();
+        PageRequest myPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Pokemon> pokemons = pokemonRepository.findAll(myPageable);
 
         if (pokemons.getContent().size() == 0)
             return ResponseEntity.noContent().build();

@@ -1,11 +1,13 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ class PokemonTypeRepositoryTest {
 
     @Autowired
     private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     static private List<PokemonType> pokemonTypes;
 

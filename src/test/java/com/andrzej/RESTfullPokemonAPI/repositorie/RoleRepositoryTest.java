@@ -1,11 +1,13 @@
 package com.andrzej.RESTfullPokemonAPI.repositorie;
 
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -25,6 +27,15 @@ class RoleRepositoryTest {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
+
+    @MockBean
+    private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     private static List<Role> roles;
 

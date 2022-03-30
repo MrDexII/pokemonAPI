@@ -3,7 +3,10 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import com.andrzej.RESTfullPokemonAPI.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +59,15 @@ class UserControllerTest {
 
     @MockBean
     private JwtConfig jwtConfig;
+
+    @MockBean
+    private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     @Test
     void ShouldReturnStatus201AndReturnUserWithOneRoleCreateUser() throws Exception {

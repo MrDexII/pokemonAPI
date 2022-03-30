@@ -2,7 +2,10 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.service.RoleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +57,15 @@ class RoleControllerTest {
 
     @MockBean
     private JwtConfig jwtConfig;
+
+    @MockBean
+    private PokemonRepository pokemonRepository;
+
+    @MockBean
+    private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private MyElasticsearchRepository myElasticsearchRepository;
 
     @Test
     public void shouldReturnStatusOkAndListOfRoles() throws Exception {
