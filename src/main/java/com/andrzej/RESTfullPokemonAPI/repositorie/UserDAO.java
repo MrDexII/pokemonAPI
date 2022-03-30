@@ -2,7 +2,6 @@ package com.andrzej.RESTfullPokemonAPI.repositorie;
 
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -10,8 +9,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public class UserDAO implements UserRepository {
+//@Repository
+public class UserDAO {
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -21,7 +20,6 @@ public class UserDAO implements UserRepository {
         this.entityManager = entityManager;
     }
 
-    @Override
     @Transactional
     public ApplicationUser save(ApplicationUser user) {
         if (user.getUser_id() != null && findById(user.getUser_id()).isPresent())
@@ -31,7 +29,6 @@ public class UserDAO implements UserRepository {
         return user;
     }
 
-    @Override
     public List<ApplicationUser> findAll() {
         String queryString = "SELECT * FROM user";
         List<ApplicationUser> users = entityManager
@@ -40,7 +37,6 @@ public class UserDAO implements UserRepository {
         return users;
     }
 
-    @Override
     public Optional<ApplicationUser> findById(Long id) {
         String queryString = "SELECT * FROM user WHERE user_id = :id";
         List<ApplicationUser> user = entityManager
@@ -50,12 +46,10 @@ public class UserDAO implements UserRepository {
         return user.stream().findFirst();
     }
 
-    @Override
     public boolean existsById(Long id) {
         return findById(id).isPresent();
     }
 
-    @Override
     public Optional<ApplicationUser> findByUsername(String username) {
         String queryString = "SELECT * FROM user WHERE username=:name";
         List<ApplicationUser> user = entityManager
@@ -65,7 +59,6 @@ public class UserDAO implements UserRepository {
         return user.stream().findFirst();
     }
 
-    @Override
     @Transactional
     public void delete(ApplicationUser user) {
         entityManager.remove(user);

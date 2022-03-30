@@ -4,9 +4,6 @@ import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUser;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
-import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import com.andrzej.RESTfullPokemonAPI.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,20 +52,10 @@ class UserControllerTest {
     private ApplicationUserService applicationUserService;
 
     @MockBean
-    private RoleRepository roleRepository;
-
-    @MockBean
     private SecretKey secretKey;
 
     @MockBean
     private JwtConfig jwtConfig;
-
-    @MockBean
-    private PokemonRepository pokemonRepository;
-
-    @MockBean
-    private PokemonTypeRepository pokemonTypeRepository;
-
 
     @Test
     void ShouldReturnStatus201AndReturnUserWithOneRoleCreateUser() throws Exception {

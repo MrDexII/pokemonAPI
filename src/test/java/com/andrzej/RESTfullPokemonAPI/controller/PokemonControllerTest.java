@@ -7,9 +7,6 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.model.Stats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
@@ -57,19 +54,10 @@ class PokemonControllerTest {
     private PokemonRepository pokemonRepository;
 
     @MockBean
-    private PokemonTypeRepository pokemonTypeRepository;
-
-    @MockBean
     private PasswordEncoder passwordEncoder;
 
     @MockBean
     private ApplicationUserService applicationUserService;
-
-    @MockBean
-    private UserRepository userRepository;
-
-    @MockBean
-    private RoleRepository roleRepository;
 
     @MockBean
     private SecretKey secretKey;
