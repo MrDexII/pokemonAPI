@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie.unused;
 
 import com.andrzej.RESTfullPokemonAPI.model.PokemonType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 //@Repository
-public class PokemonTypeDAO {
+public class PokemonTypeImp {
 
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public PokemonTypeDAO(MongoTemplate mongoTemplate) {
+    public PokemonTypeImp(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 

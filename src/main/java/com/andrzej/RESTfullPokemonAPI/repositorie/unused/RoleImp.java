@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie.unused;
 
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class RoleDAO {
+public class RoleImp {
 
     @PersistenceContext
     private final EntityManager entityManager;
 
     @Autowired
-    public RoleDAO(EntityManager entityManager) {
+    public RoleImp(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

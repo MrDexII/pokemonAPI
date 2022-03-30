@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie.unused;
 
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import org.springframework.beans.factory.annotation.Autowired;
