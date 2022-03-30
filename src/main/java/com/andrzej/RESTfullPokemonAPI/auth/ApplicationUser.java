@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "User")
+@Table(name = "users")
 public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue(generator = "sequence-generator")
@@ -20,7 +20,7 @@ public class ApplicationUser implements UserDetails {
             name = "sequence-generator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
             parameters = {
-                    @Parameter(name = "sequence_name", value = "user_sequence"),
+                    @Parameter(name = "sequence_name", value = "users_sequence"),
                     @Parameter(name = "initial_value", value = "3"),
                     @Parameter(name = "increment_size", value = "1")
             })
