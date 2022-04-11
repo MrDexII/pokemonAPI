@@ -9,7 +9,7 @@ import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -77,10 +78,10 @@ class ElasticsearchControllerTest {
     @MockBean
     private MyElasticsearchRepository myElasticsearchRepository;
 
-    private List<Pokemon> pokemons;
+    private static List<Pokemon> pokemons;
 
-    @BeforeEach
-    private void setup() {
+    @BeforeAll
+    static void setup() {
         pokemons = new ArrayList<>();
 
         Pokemon charizard = new Pokemon(
@@ -103,7 +104,7 @@ class ElasticsearchControllerTest {
     }
 
     @Test
-    void getPokemonByNameSearchAsYouType() throws Exception {
+    void shouldReturnStatus200GetPokemonByNameSearchAsYouType() throws Exception {
         Page<Pokemon> pokemonPage = new PageImpl<>(pokemons);
         PagedModel<EntityModel<Pokemon>> pagedPokemonsModel = pagedResourcesAssembler.toModel(pokemonPage, Link.of("http://localhost:8080/tets"));
         ResponseEntity<PagedModel<EntityModel<Pokemon>>> response = ResponseEntity.ok(pagedPokemonsModel);
@@ -139,5 +140,22 @@ class ElasticsearchControllerTest {
                 .andExpect(jsonPath("$.page.totalElements", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(1)))
                 .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    void shouldReturnStatus200IfContentIsNullGetPokemonByNameSearchAsYouType() throws Exception {
+        Page<Pokemon> pokemonPage = new PageImpl<>(List.of());
+        PagedModel<EntityModel<Pokemon>> pagedPokemonsModel = pagedResourcesAssembler.toModel(pokemonPage, Link.of("http://localhost:8080/tets"));
+        ResponseEntity<PagedModel<EntityModel<Pokemon>>> response = ResponseEntity.ok(pagedPokemonsModel);
+
+        given(this.elasticsearchService
+                .searchAsYouType("char", PageRequest.of(0, 10)))
+                .willReturn(response);
+
+        ResultActions resultActions = this.mockMvc
+                .perform(get("/elastic/char")
+                        .param("page", "0")
+                        .param("size", "10"));
+        resultActions.andExpect(status().isOk());
     }
 }
