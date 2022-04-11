@@ -40,22 +40,6 @@ public class ApplicationUser implements UserDetails {
     private boolean isEnabled;
 
     public ApplicationUser(String username,
-                           String password,
-                           Set<Role> authorities,
-                           boolean isAccountNonExpired,
-                           boolean isAccountNonLocked,
-                           boolean isCredentialsNonExpired,
-                           boolean isEnabled) {
-        this.username = username;
-        this.password = password;
-        this.authorities = authorities;
-        this.isAccountNonExpired = isAccountNonExpired;
-        this.isAccountNonLocked = isAccountNonLocked;
-        this.isCredentialsNonExpired = isCredentialsNonExpired;
-        this.isEnabled = isEnabled;
-    }
-
-    public ApplicationUser(String username,
                            String password) {
         this.username = username;
         this.password = password;
@@ -159,5 +143,19 @@ public class ApplicationUser implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(user_id, username, password, authorities, isAccountNonExpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled);
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{" +
+                "user_id=" + user_id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", authorities=" + authorities +
+                ", isAccountNonExpired=" + isAccountNonExpired +
+                ", isAccountNonLocked=" + isAccountNonLocked +
+                ", isCredentialsNonExpired=" + isCredentialsNonExpired +
+                ", isEnabled=" + isEnabled +
+                '}';
     }
 }
