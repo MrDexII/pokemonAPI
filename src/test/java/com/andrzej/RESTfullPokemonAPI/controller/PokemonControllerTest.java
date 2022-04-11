@@ -512,4 +512,48 @@ class PokemonControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with id: " + pokemon.get_id() + " not exists"));
     }
+
+    @Test
+    void ShouldReturnStatus200GetPokemonByNumber() throws Exception {
+        List<String> blastoiseTypes = new ArrayList<>();
+        blastoiseTypes.add("Water");
+
+        PokemonStats blastoiseStats = new PokemonStats(
+                new Stats(79, 268, 362),
+                new Stats(83, 153, 291),
+                new Stats(100, 184, 328),
+                new Stats(85, 157, 295),
+                new Stats(105, 193, 339),
+                new Stats(78, 144, 280));
+
+        Pokemon pokemon2 = new Pokemon(
+                new ObjectId(),
+                2,
+                "blastoise",
+                "blastoiseURLImage",
+                blastoiseTypes,
+                blastoiseStats);
+
+        given(this.pokemonRepository.findByNumber(2)).willReturn(Optional.of(pokemon2));
+
+        this.mockMvc.perform(
+                        get("/pokemon/findByPokemonNumber")
+                                .param("number", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._id", is(pokemon2.get_id())))
+                .andExpect(jsonPath("$.name", is("blastoise")))
+                .andExpect(jsonPath("$.fotoUrl", is("blastoiseURLImage")))
+                .andExpect(jsonPath("$.types", hasSize(1)))
+                .andExpect(jsonPath("$.types[0]", is("Water")));
+    }
+
+    @Test
+    void ShouldReturnStatus200AndReturnEmptyPokemonGetPokemonByNumber() throws Exception {
+        given(this.pokemonRepository.findByNumber(2)).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                        get("/pokemon/findByPokemonNumber")
+                                .param("number", "2"))
+                .andExpect(status().isNotFound());
+    }
 }

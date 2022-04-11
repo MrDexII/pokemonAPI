@@ -75,7 +75,7 @@ public class PokemonService {
 
     public ResponseEntity<?> updatePokemon(String id, Pokemon pokemon) {
         Optional<Pokemon> pokemonById = pokemonRepository.findById(id);
-        if (!pokemonById.isPresent()) {
+        if (pokemonById.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
         }
         pokemon.set_id(id);
@@ -85,19 +85,18 @@ public class PokemonService {
 
     public ResponseEntity<?> deletePokemon(String id) {
         Optional<Pokemon> pokemon = pokemonRepository.findById(id);
-        if (!pokemon.isPresent()) {
+        if (pokemon.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
         }
         pokemonRepository.delete(pokemon.get());
         return ResponseEntity.noContent().build();
     }
 
-    public Integer getPokemonCount() {
-        return Math.toIntExact(pokemonRepository.count());
-    }
-
-    public Pokemon getPokemonByNumber(Integer number) {
-        Optional<Pokemon> pokemonByNumber = pokemonRepository.findByNumber(number);
-        return pokemonByNumber.orElseGet(Pokemon::new);
+    public ResponseEntity<?> getPokemonByNumber(Integer number) {
+        Optional<Pokemon> optionalPokemon = pokemonRepository.findByNumber(number);
+        if (optionalPokemon.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with number: " + number + " not exists");
+        }
+        return ResponseEntity.ok(optionalPokemon.get());
     }
 }
