@@ -8,9 +8,11 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
+import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,19 +22,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -48,13 +46,13 @@ class ElasticsearchControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @SpyBean
     private PagedResourcesAssembler<Pokemon> pagedResourcesAssembler;
 
     @SpyBean
     private PokemonModelAssembler modelAssembler;
 
-    @MockBean
+    @SpyBean
     private ElasticsearchService elasticsearchService;
 
     @MockBean
@@ -78,7 +76,13 @@ class ElasticsearchControllerTest {
     @MockBean
     private MyElasticsearchRepository myElasticsearchRepository;
 
+    @MockBean
+    private PokemonService pokemonService;
+
     private static List<Pokemon> pokemons;
+
+    private static String pokemon1Link;
+    private static String pokemon2Link;
 
     @BeforeAll
     static void setup() {
@@ -101,20 +105,19 @@ class ElasticsearchControllerTest {
 
         pokemons.add(charizard);
         pokemons.add(charmander);
+        pokemon1Link = "http://localhost/pokemon/" + pokemons.get(0).get_id();
+        pokemon2Link = "http://localhost/pokemon/" + pokemons.get(1).get_id();
     }
 
     @Test
     void shouldReturnStatus200GetPokemonByNameSearchAsYouType() throws Exception {
         Page<Pokemon> pokemonPage = new PageImpl<>(pokemons);
-        PagedModel<EntityModel<Pokemon>> pagedPokemonsModel = pagedResourcesAssembler.toModel(pokemonPage, Link.of("http://localhost:8080/tets"));
-        ResponseEntity<PagedModel<EntityModel<Pokemon>>> response = ResponseEntity.ok(pagedPokemonsModel);
-
-        given(this.elasticsearchService.searchAsYouType("char", PageRequest.of(0, 10))).willReturn(response);
+        given(myElasticsearchRepository.searchAsYouType("char", PageRequest.of(0, 2))).willReturn(pokemonPage);
 
         ResultActions resultActions = this.mockMvc
                 .perform(get("/elastic/char")
                         .param("page", "0")
-                        .param("size", "10"));
+                        .param("size", "2"));
         resultActions.andExpect(status().isOk());
         verifyJson(resultActions);
     }
@@ -129,13 +132,17 @@ class ElasticsearchControllerTest {
                 .andExpect(jsonPath("$._embedded.pokemonList[0].types", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.pokemonList[0].types[0]", is(pokemons.get(0).getTypes().get(0))))
                 .andExpect(jsonPath("$._embedded.pokemonList[0].types[1]", is(pokemons.get(0).getTypes().get(1))))
+                .andExpect(jsonPath("$._embedded.pokemonList[0]._links.self.href", is(pokemon1Link)))
+                .andExpect(jsonPath("$._embedded.pokemonList[0]._links.delete.href", is(pokemon1Link)))
                 .andExpect(jsonPath("$._embedded.pokemonList[1]._id", is(pokemons.get(1).get_id())))
                 .andExpect(jsonPath("$._embedded.pokemonList[1].number", is(pokemons.get(1).getNumber())))
                 .andExpect(jsonPath("$._embedded.pokemonList[1].name", is(pokemons.get(1).getName())))
                 .andExpect(jsonPath("$._embedded.pokemonList[1].fotoUrl", is(pokemons.get(1).getFotoUrl())))
                 .andExpect(jsonPath("$._embedded.pokemonList[1].types", hasSize(1)))
                 .andExpect(jsonPath("$._embedded.pokemonList[1].types[0]", is(pokemons.get(1).getTypes().get(0))))
-                .andExpect(jsonPath("$._links.self.href", is("http://localhost:8080/tets")))
+                .andExpect(jsonPath("$._embedded.pokemonList[1]._links.self.href", is(pokemon2Link)))
+                .andExpect(jsonPath("$._embedded.pokemonList[1]._links.delete.href", is(pokemon2Link)))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/elastic/char")))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalElements", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(1)))
@@ -145,17 +152,12 @@ class ElasticsearchControllerTest {
     @Test
     void shouldReturnStatus200IfContentIsNullGetPokemonByNameSearchAsYouType() throws Exception {
         Page<Pokemon> pokemonPage = new PageImpl<>(List.of());
-        PagedModel<EntityModel<Pokemon>> pagedPokemonsModel = pagedResourcesAssembler.toModel(pokemonPage, Link.of("http://localhost:8080/tets"));
-        ResponseEntity<PagedModel<EntityModel<Pokemon>>> response = ResponseEntity.ok(pagedPokemonsModel);
-
-        given(this.elasticsearchService
-                .searchAsYouType("char", PageRequest.of(0, 10)))
-                .willReturn(response);
+        given(myElasticsearchRepository.searchAsYouType("char", PageRequest.of(0, 2))).willReturn(pokemonPage);
 
         ResultActions resultActions = this.mockMvc
                 .perform(get("/elastic/char")
                         .param("page", "0")
-                        .param("size", "10"));
-        resultActions.andExpect(status().isOk());
+                        .param("size", "2"));
+        resultActions.andExpect(status().isNoContent());
     }
 }
