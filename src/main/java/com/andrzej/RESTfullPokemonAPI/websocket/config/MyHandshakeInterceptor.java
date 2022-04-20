@@ -28,15 +28,14 @@ public class MyHandshakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler handler,
                                    Map<String, Object> attributes) throws Exception {
         Map<String, String[]> parameterMap = ((ServletServerHttpRequest) request).getServletRequest().getParameterMap();
-        if (parameterMap.containsKey("token")) {
-            String tokenFromParam = Arrays.toString(parameterMap.get("token"));
-            if (tokenFromParam.length() <= 6) {
-                throw new IllegalStateException(String.format("Token %s cannot be trusted", tokenFromParam));
-            }
-            String token = tokenFromParam.substring(8);
-            JwtAuthenticationUtils.setAuthenticationBasedOnToken(token, secretKey);
-        }
+        if (!parameterMap.containsKey("token")) return false;
 
+        String tokenFromParam = Arrays.toString(parameterMap.get("token"));
+        if (tokenFromParam.length() <= 6) {
+            throw new IllegalStateException(String.format("Token %s cannot be trusted", tokenFromParam));
+        }
+        String token = tokenFromParam.substring(8);
+        JwtAuthenticationUtils.setAuthenticationBasedOnToken(token, secretKey);
         return true;
     }
 
@@ -45,6 +44,5 @@ public class MyHandshakeInterceptor implements HandshakeInterceptor {
                                ServerHttpResponse response,
                                WebSocketHandler handler,
                                Exception e) {
-
     }
 }
