@@ -41,8 +41,8 @@ public class PokemonController {
     }
 
     @GetMapping("/findByPokemonNumber")
-    public ResponseEntity<Pokemon> getPokemonByNumber(@RequestParam("number") Integer number) {
-        return ResponseEntity.ok(pokemonService.getPokemonByNumber(number));
+    public ResponseEntity<?> getPokemonByNumber(@RequestParam("number") Integer number) {
+        return pokemonService.getPokemonByNumber(number);
     }
 
     @PutMapping("/{id}")

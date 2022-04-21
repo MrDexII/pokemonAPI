@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "User")
+@Table(name = "users")
 public class ApplicationUser implements UserDetails {
     @Id
     @GeneratedValue(generator = "sequence-generator")
@@ -20,7 +20,7 @@ public class ApplicationUser implements UserDetails {
             name = "sequence-generator",
             strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
             parameters = {
-                    @Parameter(name = "sequence_name", value = "user_sequence"),
+                    @Parameter(name = "sequence_name", value = "users_sequence"),
                     @Parameter(name = "initial_value", value = "3"),
                     @Parameter(name = "increment_size", value = "1")
             })
@@ -38,22 +38,6 @@ public class ApplicationUser implements UserDetails {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
-
-    public ApplicationUser(String username,
-                           String password,
-                           Set<Role> authorities,
-                           boolean isAccountNonExpired,
-                           boolean isAccountNonLocked,
-                           boolean isCredentialsNonExpired,
-                           boolean isEnabled) {
-        this.username = username;
-        this.password = password;
-        this.authorities = authorities;
-        this.isAccountNonExpired = isAccountNonExpired;
-        this.isAccountNonLocked = isAccountNonLocked;
-        this.isCredentialsNonExpired = isCredentialsNonExpired;
-        this.isEnabled = isEnabled;
-    }
 
     public ApplicationUser(String username,
                            String password) {
@@ -159,5 +143,19 @@ public class ApplicationUser implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(user_id, username, password, authorities, isAccountNonExpired, isAccountNonLocked, isCredentialsNonExpired, isEnabled);
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{" +
+                "user_id=" + user_id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", authorities=" + authorities +
+                ", isAccountNonExpired=" + isAccountNonExpired +
+                ", isAccountNonLocked=" + isAccountNonLocked +
+                ", isCredentialsNonExpired=" + isCredentialsNonExpired +
+                ", isEnabled=" + isEnabled +
+                '}';
     }
 }

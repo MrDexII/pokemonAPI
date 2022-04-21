@@ -1,9 +1,9 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie.unused;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface DAORepository<T, E> {
+public interface MyRepository<T, E> {
 
     T save(T element);
 

@@ -2,13 +2,13 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 
 import com.andrzej.RESTfullPokemonAPI.assembler.PokemonModelAssembler;
 import com.andrzej.RESTfullPokemonAPI.auth.ApplicationUserService;
+import com.andrzej.RESTfullPokemonAPI.elasticsearch.repository.MyElasticsearchRepository;
 import com.andrzej.RESTfullPokemonAPI.jwt.JwtConfig;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.model.PokemonStats;
 import com.andrzej.RESTfullPokemonAPI.model.Stats;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.RoleRepository;
-import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
+import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonTypeRepository;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
@@ -19,10 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
@@ -62,12 +59,6 @@ class PokemonControllerTest {
     private ApplicationUserService applicationUserService;
 
     @MockBean
-    private UserRepository userRepository;
-
-    @MockBean
-    private RoleRepository roleRepository;
-
-    @MockBean
     private SecretKey secretKey;
 
     @MockBean
@@ -81,6 +72,12 @@ class PokemonControllerTest {
 
     @SpyBean
     PagedResourcesAssembler<Pokemon> pagedResourcesAssembler;
+
+    @MockBean
+    private PokemonTypeRepository pokemonTypeRepository;
+
+    @MockBean
+    private MyElasticsearchRepository elasticsearchRepository;
 
     @Test
     void ShouldReturnStatus201AndCreatePokemon() throws Exception {
@@ -203,7 +200,9 @@ class PokemonControllerTest {
         String expectedCharizardLink = "http://localhost/pokemon/" + pokemon.get_id();
         String expectedBlastoiseLink = "http://localhost/pokemon/" + pokemon2.get_id();
 
-        Pageable pageable = PageRequest.of(0, 2);
+        Sort sort = Sort.by("number").ascending();
+
+        Pageable pageable = PageRequest.of(0, 2, sort);
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
         Page<Pokemon> pages = new PageImpl<>(
@@ -237,7 +236,7 @@ class PokemonControllerTest {
                 .andExpect(jsonPath("$._links.self.href",
                         is("http://localhost/pokemon/?page=" +
                                 pageable.getPageNumber() + "&size=" +
-                                pageable.getPageSize() + "")))
+                                pageable.getPageSize() + "&sort=number,asc")))
                 .andExpect(jsonPath("$.page.size", is(pageable.getPageSize())))
                 .andExpect(jsonPath("$.page.totalElements", is(pokemons.size())))
                 .andExpect(jsonPath("$.page.totalPages", is(pokemons.size() / pageable.getPageSize())))
@@ -248,14 +247,18 @@ class PokemonControllerTest {
     void ShouldReturnStatus200AndReturnEmptyListGetAllPokemons() throws Exception {
         List<Pokemon> pokemons = new ArrayList<>();
 
-        Pageable pageable = PageRequest.of(0, 2);
+        Sort sort = Sort.by("number").ascending();
+
+        Pageable pageable = PageRequest.of(0, 2, sort);
         Page<Pokemon> pages = new PageImpl<>(pokemons, pageable, pokemons.size());
         given(this.pokemonRepository.findAll(pageable)).willReturn(pages);
 
         this.mockMvc.perform(
                         get("/pokemon/")
                                 .param("page", "0")
-                                .param("size", "2"))
+                                .param("size", "2")
+                                .param("sort", "number"))
+
                 .andExpect(status().isNoContent());
     }
 
@@ -508,5 +511,49 @@ class PokemonControllerTest {
                         delete("/pokemon/" + pokemon.get_id()))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Pokemon with id: " + pokemon.get_id() + " not exists"));
+    }
+
+    @Test
+    void ShouldReturnStatus200GetPokemonByNumber() throws Exception {
+        List<String> blastoiseTypes = new ArrayList<>();
+        blastoiseTypes.add("Water");
+
+        PokemonStats blastoiseStats = new PokemonStats(
+                new Stats(79, 268, 362),
+                new Stats(83, 153, 291),
+                new Stats(100, 184, 328),
+                new Stats(85, 157, 295),
+                new Stats(105, 193, 339),
+                new Stats(78, 144, 280));
+
+        Pokemon pokemon2 = new Pokemon(
+                new ObjectId(),
+                2,
+                "blastoise",
+                "blastoiseURLImage",
+                blastoiseTypes,
+                blastoiseStats);
+
+        given(this.pokemonRepository.findByNumber(2)).willReturn(Optional.of(pokemon2));
+
+        this.mockMvc.perform(
+                        get("/pokemon/findByPokemonNumber")
+                                .param("number", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._id", is(pokemon2.get_id())))
+                .andExpect(jsonPath("$.name", is("blastoise")))
+                .andExpect(jsonPath("$.fotoUrl", is("blastoiseURLImage")))
+                .andExpect(jsonPath("$.types", hasSize(1)))
+                .andExpect(jsonPath("$.types[0]", is("Water")));
+    }
+
+    @Test
+    void ShouldReturnStatus200AndReturnEmptyPokemonGetPokemonByNumber() throws Exception {
+        given(this.pokemonRepository.findByNumber(2)).willReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                        get("/pokemon/findByPokemonNumber")
+                                .param("number", "2"))
+                .andExpect(status().isNotFound());
     }
 }

@@ -9,6 +9,7 @@ import com.andrzej.RESTfullPokemonAPI.websocket.utils.PokemonUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -160,7 +161,7 @@ public class BattleService {
         } else if (gameSession.getUserSessionsList()[0].getPokemonList().length == 0) {
             gameSession.getUserSessionsList()[0].setMessage("You lost");
             gameSession.getUserSessionsList()[1].setMessage("You won");
-        } else if (gameSession.getUserSessionsList()[1].getPokemonList().length == 0){
+        } else if (gameSession.getUserSessionsList()[1].getPokemonList().length == 0) {
             gameSession.getUserSessionsList()[0].setMessage("You won");
             gameSession.getUserSessionsList()[1].setMessage("You lost");
         }
@@ -197,7 +198,11 @@ public class BattleService {
     }
 
     private Pokemon mapNumberToPokemon(int pokemonNumber) {
-        return pokemonService.getPokemonByNumber(pokemonNumber);
+        ResponseEntity<?> response = pokemonService.getPokemonByNumber(pokemonNumber);
+        if (response.getBody() instanceof Pokemon pokemon) {
+            return pokemon;
+        }
+        return new Pokemon();
     }
 
     private Pokemon[] mapNumbersToPokemonArray(Set<Integer> pokemonNumbers) {

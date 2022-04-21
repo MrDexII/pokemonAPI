@@ -27,7 +27,7 @@ public class WebSocketChatEventListener {
 
     @EventListener
     public void handleWebSocketConnectionListener(SessionConnectedEvent event) {
-        logger.info("Received a new web socket connection "+ event.toString());
+        logger.info("Received a new web socket connection " + event.toString());
     }
 
     @EventListener
@@ -35,14 +35,14 @@ public class WebSocketChatEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         Principal principal = (Principal) headerAccessor.getMessageHeaders().get("simpUser");
         String username = principal.getName();
-        if (username != null) {
-            sessionService.deleteUserByUserName(username);
-            WebSocketChatMessage chatMessage = new WebSocketChatMessage();
-            chatMessage.setType("Leave");
-            chatMessage.setSender(username);
-            chatMessage.setUserSessionsList(sessionService.getUserSessionsList());
-            messageTemplate.convertAndSend("/topic/gameChat", chatMessage);
-        }
-        logger.info("Session disconnect "+ event.toString());
+        if (username == null) return;
+        sessionService.deleteUserByUserName(username);
+
+        WebSocketChatMessage chatMessage = new WebSocketChatMessage();
+        chatMessage.setType("Leave");
+        chatMessage.setSender(username);
+        chatMessage.setUserSessionsList(sessionService.getUserSessionsList());
+        messageTemplate.convertAndSend("/topic/gameChat", chatMessage);
+        logger.info("Session disconnect " + event.toString());
     }
 }

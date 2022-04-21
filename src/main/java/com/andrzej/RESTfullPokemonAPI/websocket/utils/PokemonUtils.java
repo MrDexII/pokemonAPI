@@ -81,56 +81,60 @@ public class PokemonUtils {
 
     //rock paper scissors implementation
     public static int returnWinningPokemonIndex(Pokemon pokemon1, Pokemon pokemon2) {
-        int pokemon1TypesNumber1 = -1;
-        int pokemon1TypesNumber2 = -1;
-        int pokemon2TypesNumber1 = -1;
-        int pokemon2TypesNumber2 = -1;
-        boolean isPokemon1Contains2Types, isPokemon2Contains2Types;
-        double pokemon1Points = 0;
-        double pokemon2Points = 0;
+        Object obj = new Object();
 
-        List<String> pokemon1Types = pokemon1.getTypes();
-        List<String> pokemon2Types = pokemon2.getTypes();
+        synchronized (obj) {
+            int pokemon1TypesNumber1 = -1;
+            int pokemon1TypesNumber2 = -1;
+            int pokemon2TypesNumber1 = -1;
+            int pokemon2TypesNumber2 = -1;
+            boolean isPokemon1Contains2Types, isPokemon2Contains2Types;
+            double pokemon1Points = 0;
+            double pokemon2Points = 0;
 
-        pokemon1TypesNumber1 = pokemonTypesMap.get(pokemon1Types.get(0).toLowerCase());
-        pokemon2TypesNumber1 = pokemonTypesMap.get(pokemon2Types.get(0).toLowerCase());
+            List<String> pokemon1Types = pokemon1.getTypes();
+            List<String> pokemon2Types = pokemon2.getTypes();
 
-        pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber1];
-        pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber1];
+            pokemon1TypesNumber1 = pokemonTypesMap.get(pokemon1Types.get(0).toLowerCase());
+            pokemon2TypesNumber1 = pokemonTypesMap.get(pokemon2Types.get(0).toLowerCase());
 
-        isPokemon1Contains2Types = (pokemon1Types.size() == 2);
-        isPokemon2Contains2Types = (pokemon2Types.size() == 2);
+            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber1];
+            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber1];
 
-        if (isPokemon1Contains2Types) {
-            pokemon1TypesNumber2 = pokemonTypesMap.get(pokemon1Types.get(1).toLowerCase());
-        }
-        if (isPokemon2Contains2Types) {
-            pokemon2TypesNumber2 = pokemonTypesMap.get(pokemon2Types.get(1).toLowerCase());
-        }
+            isPokemon1Contains2Types = (pokemon1Types.size() == 2);
+            isPokemon2Contains2Types = (pokemon2Types.size() == 2);
 
-        if (isPokemon1Contains2Types && isPokemon2Contains2Types) {
-            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber2];
-            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber1];
+            if (isPokemon1Contains2Types) {
+                pokemon1TypesNumber2 = pokemonTypesMap.get(pokemon1Types.get(1).toLowerCase());
+            }
+            if (isPokemon2Contains2Types) {
+                pokemon2TypesNumber2 = pokemonTypesMap.get(pokemon2Types.get(1).toLowerCase());
+            }
 
-            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber1];
-            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber2];
+            if (isPokemon1Contains2Types && isPokemon2Contains2Types) {
+                pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber2];
+                pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber1];
 
-            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber2];
-            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber2];
-        } else if (isPokemon1Contains2Types) {
-            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber1];
-            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber2];
-        } else if (isPokemon2Contains2Types) {
-            pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber2];
-            pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber1];
-        }
+                pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber1];
+                pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber2];
 
-        if (pokemon1Points == pokemon2Points) {
-            return -1;
-        } else if (pokemon1Points > pokemon2Points) {
-            return 0;
-        } else {
-            return 1;
+                pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber2];
+                pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber2];
+            } else if (isPokemon1Contains2Types) {
+                pokemon1Points += pokemonTypesTable[pokemon1TypesNumber2][pokemon2TypesNumber1];
+                pokemon2Points += pokemonTypesTable[pokemon2TypesNumber1][pokemon1TypesNumber2];
+            } else if (isPokemon2Contains2Types) {
+                pokemon1Points += pokemonTypesTable[pokemon1TypesNumber1][pokemon2TypesNumber2];
+                pokemon2Points += pokemonTypesTable[pokemon2TypesNumber2][pokemon1TypesNumber1];
+            }
+
+            if (pokemon1Points == pokemon2Points) {
+                return -1;
+            } else if (pokemon1Points > pokemon2Points) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
     }
 }
