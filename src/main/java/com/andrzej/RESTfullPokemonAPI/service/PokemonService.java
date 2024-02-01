@@ -5,7 +5,9 @@ import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.repositorie.PokemonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -45,7 +47,9 @@ public class PokemonService {
     }
 
     public ResponseEntity<?> getAllPokemons(Pageable pageable) {
-        Page<Pokemon> pokemons = pokemonRepository.findAll(pageable);
+        Sort sort = Sort.by("number").ascending();
+        PageRequest myPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        Page<Pokemon> pokemons = pokemonRepository.findAll(myPageable);
 
         if (pokemons.getContent().size() == 0)
             return ResponseEntity.noContent().build();
@@ -71,7 +75,7 @@ public class PokemonService {
 
     public ResponseEntity<?> updatePokemon(String id, Pokemon pokemon) {
         Optional<Pokemon> pokemonById = pokemonRepository.findById(id);
-        if (!pokemonById.isPresent()) {
+        if (pokemonById.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
         }
         pokemon.set_id(id);
@@ -81,10 +85,18 @@ public class PokemonService {
 
     public ResponseEntity<?> deletePokemon(String id) {
         Optional<Pokemon> pokemon = pokemonRepository.findById(id);
-        if (!pokemon.isPresent()) {
+        if (pokemon.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with id: " + id + " not exists");
         }
         pokemonRepository.delete(pokemon.get());
         return ResponseEntity.noContent().build();
+    }
+
+    public ResponseEntity<?> getPokemonByNumber(Integer number) {
+        Optional<Pokemon> optionalPokemon = pokemonRepository.findByNumber(number);
+        if (optionalPokemon.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pokemon with number: " + number + " not exists");
+        }
+        return ResponseEntity.ok(optionalPokemon.get());
     }
 }

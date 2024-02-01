@@ -1,17 +1,26 @@
 package com.andrzej.RESTfullPokemonAPI.auth;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Role")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
 
     @Id
+    @GeneratedValue(generator = "sequence-generator")
+    @GenericGenerator(
+            name = "sequence-generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @Parameter(name = "sequence_name", value = "roles_sequence"),
+                    @Parameter(name = "initial_value", value = "3"),
+                    @Parameter(name = "increment_size", value = "1")
+            })
     private Long role_id;
     private String role;
 

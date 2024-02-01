@@ -1,4 +1,4 @@
-package com.andrzej.RESTfullPokemonAPI.repositorie;
+package com.andrzej.RESTfullPokemonAPI.repositorie.unused;
 
 import com.andrzej.RESTfullPokemonAPI.auth.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class RoleDAO implements RoleRepository {
+public class RoleImp {
 
     @PersistenceContext
     private final EntityManager entityManager;
 
     @Autowired
-    public RoleDAO(EntityManager entityManager) {
+    public RoleImp(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
-    @Override
     public Optional<Role> findByRole(String roleName) {
         String queryString = "SELECT * FROM role r WHERE role =:roleName";
         List<Role> roles = entityManager
@@ -30,7 +29,6 @@ public class RoleDAO implements RoleRepository {
         return roles.stream().findFirst();
     }
 
-    @Override
     public Role save(Role role) {
         if (role.getRole_id() != null)
             entityManager.merge(role);
@@ -39,7 +37,6 @@ public class RoleDAO implements RoleRepository {
         return role;
     }
 
-    @Override
     public Optional<Role> findById(Long id) {
         String queryString = "SELECT * FROM roles WHERE id=:id";
         List<Role> role = entityManager
@@ -49,12 +46,10 @@ public class RoleDAO implements RoleRepository {
         return role.stream().findFirst();
     }
 
-    @Override
     public boolean existsById(Long id) {
         return findById(id).isPresent();
     }
 
-    @Override
     public List<Role> findAll() {
         String queryString = "SELECT * FROM role";
         List<Role> roles = entityManager
@@ -63,7 +58,6 @@ public class RoleDAO implements RoleRepository {
         return roles;
     }
 
-    @Override
     public void delete(Role role) {
         entityManager.remove(role);
     }

@@ -1,7 +1,7 @@
 package com.andrzej.RESTfullPokemonAPI.auth;
 
+import com.andrzej.RESTfullPokemonAPI.repositorie.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApplicationUserService implements UserDetailsService {
 
-    private final ApplicationUserDao applicationUserDao;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ApplicationUserService(@Qualifier("MySQL") ApplicationUserDao applicationUserDao) {
-        this.applicationUserDao = applicationUserDao;
+    public ApplicationUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return applicationUserDao.selectApplicationUserByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User with name %s not found", username)));
     }
 }

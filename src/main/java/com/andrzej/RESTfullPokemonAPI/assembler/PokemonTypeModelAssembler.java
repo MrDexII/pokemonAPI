@@ -13,7 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class PokemonTypeModelAssembler implements RepresentationModelAssembler<PokemonType, EntityModel<PokemonType>> {
     @Override
     public EntityModel<PokemonType> toModel(PokemonType pokemonType) {
-        return new EntityModel<>(pokemonType,
+        return EntityModel.of(pokemonType,
                 linkTo(methodOn(PokemonTypeController.class).getPokemonTypeById(pokemonType.get_id())).withSelfRel(),
                 linkTo(methodOn(PokemonTypeController.class).getAllPokemonTypes()).withRel("allPokemonTypes"),
                 linkTo(methodOn(PokemonTypeController.class).deletePokemonType(pokemonType.get_id())).withRel("deletePokemonType")

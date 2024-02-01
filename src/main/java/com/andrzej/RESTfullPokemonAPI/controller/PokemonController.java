@@ -40,6 +40,11 @@ public class PokemonController {
         return pokemonService.getPokemonByName(name);
     }
 
+    @GetMapping("/findByPokemonNumber")
+    public ResponseEntity<?> getPokemonByNumber(@RequestParam("number") Integer number) {
+        return pokemonService.getPokemonByNumber(number);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updatePokemon(@PathVariable("id") String id, @RequestBody Pokemon pokemon) {
@@ -51,4 +56,5 @@ public class PokemonController {
     public ResponseEntity<?> deletePokemon(@PathVariable("id") String id) {
         return pokemonService.deletePokemon(id);
     }
+
 }

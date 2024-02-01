@@ -1,0 +1,81 @@
+version: '3.1'
+
+services:
+  mongo1:
+    container_name: mongo1
+    image: mongo:5.0.6
+    volumes:
+      - ./docker-entrypoint/mongors/data1:/data/db
+      - ./docker-entrypoint/init:/docker-entrypoint-initdb.d
+    ports:
+      - 30001:30001
+    links:
+      - mongo2
+      - mongo3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--port", "30001" ]
+    healthcheck:
+      test: test $$(echo "rs.initiate({_id:'dbrs',members:[{_id:0,host:\"mongo1:30001\"},{_id:1,host:\"mongo2:30002\"},{_id:2,host:\"mongo3:30003\"}]}).ok || rs.status().ok" | mongo --port 30001 --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+
+  mongo2:
+    container_name: mongo2
+    image: mongo:5.0.6
+    volumes:
+      - ./docker-entrypoint/mongors/data2:/data/db
+    ports:
+      - 30002:30002
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--port", "30002" ]
+
+  mongo3:
+    container_name: mongo3
+    image: mongo:5.0.6
+    volumes:
+      - ./docker-entrypoint/mongors/data3:/data/db
+    ports:
+      - 30003:30003
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs", "--port", "30003" ]
+
+  mysql:
+    image: mysql:8.0.27
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: users
+    ports:
+      - 3306:3306
+
+  rabbitmq:
+    image: rabbitmq:3.9.12-management-alpine
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 15672:15672
+      - 61613:61613
+    volumes:
+      - ./docker-entrypoint/rabbit_enabled_plugins.env:/etc/rabbitmq/enabled_plugins
+
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+
+  monstache:
+    container_name: monstache
+    image: rwynn/monstache:6.7.7
+    working_dir: /monstache
+    command: -f ./monstache-config.toml
+    environment:
+      - MONSTACHE_ES_URLS=http://elasticsearch:9200
+    ports:
+      - 9227:9227
+    volumes:
+      - ./docker-entrypoint/monstache:/monstache
