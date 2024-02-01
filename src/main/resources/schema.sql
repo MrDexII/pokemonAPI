@@ -1,9 +1,9 @@
-CREATE TABLE roles (
+CREATE TABLE IF NOT EXISTS  roles (
     role_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     role VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS  users (
     user_id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     is_account_non_expired BIT NOT NULL,
     is_account_non_locked BIT NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE users (
     username VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE users_roles(
+CREATE TABLE IF NOT EXISTS  users_roles(
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (user_id),
