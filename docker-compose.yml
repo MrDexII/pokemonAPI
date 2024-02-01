@@ -5,7 +5,8 @@ services:
     container_name: mongo1
     image: mongo:5.0.6
     volumes:
-      - "./docker-entrypoint/mongors/data1:/data/db"
+      - ./docker-entrypoint/mongors/data1:/data/db
+      - ./docker-entrypoint/init:/docker-entrypoint-initdb.d
     ports:
       - 30001:30001
     links:
@@ -22,7 +23,7 @@ services:
     container_name: mongo2
     image: mongo:5.0.6
     volumes:
-      - "./docker-entrypoint/mongors/data2:/data/db"
+      - ./docker-entrypoint/mongors/data2:/data/db
     ports:
       - 30002:30002
     restart: always
@@ -32,7 +33,7 @@ services:
     container_name: mongo3
     image: mongo:5.0.6
     volumes:
-      - "./docker-entrypoint/mongors/data3:/data/db"
+      - ./docker-entrypoint/mongors/data3:/data/db
     ports:
       - 30003:30003
     restart: always
@@ -56,7 +57,7 @@ services:
       - 15672:15672
       - 61613:61613
     volumes:
-      - "./docker-entrypoint/rabbit_enabled_plugins.env:/etc/rabbitmq/enabled_plugins"
+      - ./docker-entrypoint/rabbit_enabled_plugins.env:/etc/rabbitmq/enabled_plugins
 
   elasticsearch:
     image: elasticsearch:7.17.0
@@ -77,4 +78,4 @@ services:
     ports:
       - 9227:9227
     volumes:
-      - "./docker-entrypoint/monstache:/monstache"
+      - ./docker-entrypoint/monstache:/monstache
