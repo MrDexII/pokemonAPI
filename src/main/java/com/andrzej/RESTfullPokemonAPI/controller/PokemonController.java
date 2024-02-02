@@ -3,10 +3,11 @@ package com.andrzej.RESTfullPokemonAPI.controller;
 import com.andrzej.RESTfullPokemonAPI.model.Pokemon;
 import com.andrzej.RESTfullPokemonAPI.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/pokemon")
@@ -25,9 +26,10 @@ public class PokemonController {
         return pokemonService.createPokemon(pokemon);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> getAllPokemons(Pageable pageable) {
-        return pokemonService.getAllPokemons(pageable);
+    @GetMapping("/page")
+    public ResponseEntity<?> getAllPokemons(@RequestParam(required = false) Optional<Integer> page,
+                                            @RequestParam(required = false) Optional<Integer> size) {
+        return pokemonService.getAllPokemons(page, size);
     }
 
     @GetMapping("/{id}")
