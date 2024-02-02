@@ -23,13 +23,16 @@ Hasło: user
 ```
 ## Endpointy
 
+### Swagger 
+http://localhost:8080/swagger-ui/ - gui do przeglądania endpointów 
+
 ### Login
-POST http://localhost:8080/login
+POST http://localhost:8080/login - logowanie 
 
 ### Pokemon
 POST http://localhost:8080/pokemon/ - dodaje nowego pokemona 
 
-GET http://localhost:8080/pokemon/ - zwraca listę pokemonów 
+GET http://localhost:8080/pokemon/page?page={pageNumber}&size={sizeNumber} - zwraca listę pokemonów z wykorzystaniem stronicowania
 
 GET http://localhost:8080/pokemon/{id} - zwraca pokemona o podanym id 
 
@@ -38,6 +41,8 @@ GET http://localhost:8080/pokemon/find?name={name} - zwraca pokemona o podanej n
 PUT http://localhost:8080/pokemon/{id} - uaktualnia pokemona o danym id 
 
 DELETE http://localhost:8080/pokemon/{id} - usuwa pokemona o danym id 
+
+GET http://localhost:8080/pokemon/findByPokemonNumber?number={number} - wyszukuje pokemona po numerze w pokedeksie 
 
 ### PokemonType
 POST http://localhost:8080/pokemon/type/ - dodaje nowy typ pokemona
