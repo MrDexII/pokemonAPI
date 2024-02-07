@@ -29,6 +29,12 @@ http://localhost:8080/swagger-ui/ - gui do przeglądania endpointów
 ### Login
 POST http://localhost:8080/login - logowanie 
 
+### Elasticsearch
+GET http://localhost:8080/elastic/{pokemonName} - szukaj kiedy piszesz 
+
+### WebSocket
+GET http://localhost:8080/gameSession/{id} - szuka sesji gry o podanym id
+
 ### Pokemon
 POST http://localhost:8080/pokemon/ - dodaje nowego pokemona 
 
@@ -74,3 +80,8 @@ GET http://localhost:8080/pokemon/user/find?name={name} - zwraca użytkownika o 
 PUT http://localhost:8080/pokemon/user/{id} - uaktualnia użytkownika o danym id
 
 DELETE http://localhost:8080/pokemon/user/{id} - usuwa użytkownika o danym id
+
+### Rabbitmq topics
+- /topic/gameChat
+- /topic/users-user{userSessionId}
+- /topic/lobby.{lobbyId}
